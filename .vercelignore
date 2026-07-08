@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+qa/
+*.log
+*.tsbuildinfo
+2017_porsche_911_991_gt3_rs.glb
+2019_porsche_911_991.2_gt3_rs.glb
+8fff1233-af3d-4388-ada0-11ea11e94e9c.png
+微信图片_20260707135625_38_815.jpg
+stitch_heritage_porsche_bespoke/
