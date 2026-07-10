@@ -22,7 +22,7 @@ export function SiteNav() {
     <header className="nav-bar">
       <nav className="nav-inner" aria-label="Primary navigation">
         <Link className="logo-lockup" href="/" aria-label="CarbonForge home">
-          <Image src="/brand/carbonforge-logo.png" alt="" width={96} height={54} priority />
+          <Image src="/brand/flame-logo.png" alt="" width={545} height={832} priority />
           <span>CarbonForge</span>
         </Link>
 
