@@ -4,9 +4,9 @@ import { Providers } from "@/components/Providers";
 import { SiteNav } from "@/components/SiteNav";
 
 export const metadata: Metadata = {
-  title: "CarbonForge | Bespoke Porsche Heritage Components",
+  title: "Bespoke Elemental | Classic Porsche 911 Components",
   description:
-    "A high-end B2C storefront for classic Porsche carbon fiber, machined metal, and bespoke performance components."
+    "Bespoke Elemental: Refine the Soul of the 911. Premium restoration, tuning, and OE aftermarket parts for classic Porsche models."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

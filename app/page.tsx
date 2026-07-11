@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowRight, ChevronDown, Gauge, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 import { AnimatedShell } from "@/components/AnimatedShell";
 import { BuildConfigurator } from "@/components/BuildConfigurator";
-import { CarShowcase } from "@/components/CarShowcase";
 import { Footer } from "@/components/Footer";
+import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductCard } from "@/components/ProductCard";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { featuredProduct, formatCurrency, products } from "@/data/products";
@@ -14,9 +14,8 @@ export default function HomePage() {
   return (
     <AnimatedShell>
       <main>
-        <section className="hero-section model-hero" aria-label="Interactive Porsche 3D model viewer">
-          <CarShowcase />
-          <div className="carbon-weave" />
+        <section className="hero-section carousel-hero" aria-label="Classic Porsche showcase">
+          <HeroCarousel />
           <a className="hero-scroll-cue" href="#featured-modification" aria-label="Scroll to next section">
             <ChevronDown size={30} aria-hidden="true" />
           </a>
@@ -70,7 +69,7 @@ export default function HomePage() {
               <div className="panel" style={{ overflow: "hidden" }}>
                 <img
                   src="/images/carbonforge-hero.jpg"
-                  alt="Carbon fiber body panel with CarbonForge mark"
+                  alt="Carbon fiber body panel in the Bespoke Elemental workshop"
                   style={{ width: "100%", height: "min(64vw, 640px)", objectFit: "cover" }}
                 />
               </div>
@@ -96,7 +95,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="section">
+        <section className="section" id="latest-release">
           <div className="container">
             <div
               className="reveal"

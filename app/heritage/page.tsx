@@ -35,9 +35,9 @@ export default function HeritagePage() {
           style={{
             minHeight: "72dvh",
             backgroundImage:
-              "linear-gradient(180deg, rgba(5,5,5,.18), rgba(5,5,5,.92)), url('/images/carbonforge-hero.jpg')",
+              "linear-gradient(180deg, rgba(5,5,5,.2), rgba(5,5,5,.9)), url('/images/bespoke-elemental/heritage-hero-hd.webp')",
             backgroundSize: "cover",
-            backgroundPosition: "center"
+            backgroundPosition: "center 42%"
           }}
         >
           <div className="carbon-weave" />
@@ -47,7 +47,7 @@ export default function HeritagePage() {
               Modern Tech, <span className="red">Classic Soul</span>
             </h1>
             <p style={{ marginInline: "auto" }}>
-              A private workshop philosophy for owners who want progress without erasing the
+              Advanced and refined production for owners who want progress without erasing the
               analogue character of a vintage Porsche.
             </p>
           </div>
@@ -65,10 +65,9 @@ export default function HeritagePage() {
             </div>
             <div className="reveal" style={{ gridColumn: "span 7" }}>
               <p className="muted" style={{ lineHeight: 1.78, fontSize: "1.08rem" }}>
-                CarbonForge builds components that feel native to the air-cooled era while using
-                current materials and manufacturing standards. We keep the interface restrained:
-                better steering feel, cleaner cabin surfaces, lighter panels, and detail parts
-                that look machined for the car rather than added after the fact.
+                We're actively providing exquisite parts for classic Porsche 911 both interior and
+                outside of the cars. Customed parts for restorations, upgradings, and OE aftermarket
+                substitutes are mianly within our focus.
               </p>
             </div>
           </div>

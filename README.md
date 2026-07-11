@@ -1,4 +1,4 @@
-# CarbonForge Porsche B2C Frontend
+# Bespoke Elemental Porsche B2C Frontend
 
 Next.js storefront for classic Porsche parts and bespoke modifications.
 

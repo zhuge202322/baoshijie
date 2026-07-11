@@ -2,7 +2,8 @@ export type Product = {
   slug: string;
   name: string;
   partNo: string;
-  category: "Interior Components" | "Performance Tuning" | "Exterior Aero" | "Workshop Essentials";
+  category: "Exterior Aero" | "Interior Components" | "Performance parts" | "OE aftermarket parts";
+  productType: "Bespoke" | "OE aftermarket";
   material: "Carbon Fiber" | "Machined Metal" | "Composite Polymer";
   price: number;
   image: string;
@@ -19,6 +20,7 @@ export const products: Product[] = [
     name: "Carbon Fiber Heritage Steering Wheel",
     partNo: "CF-H-911-380",
     category: "Interior Components",
+    productType: "Bespoke",
     material: "Carbon Fiber",
     price: 2450,
     badge: "Limited Heritage Edition",
@@ -39,7 +41,8 @@ export const products: Product[] = [
     slug: "billet-aluminum-pedals",
     name: "Billet Aluminum Pedals",
     partNo: "BA-PERF-01",
-    category: "Performance Tuning",
+    category: "OE aftermarket parts",
+    productType: "OE aftermarket",
     material: "Machined Metal",
     price: 890,
     image:
@@ -60,6 +63,7 @@ export const products: Product[] = [
     name: "Lightweight Door Panels",
     partNo: "CF-911-EXT-LP",
     category: "Interior Components",
+    productType: "Bespoke",
     material: "Composite Polymer",
     price: 1420,
     image:
@@ -79,7 +83,8 @@ export const products: Product[] = [
     slug: "forged-magnesium-center-lock",
     name: "Forged Magnesium Center Lock",
     partNo: "MG-CL-993",
-    category: "Performance Tuning",
+    category: "Performance parts",
+    productType: "Bespoke",
     material: "Machined Metal",
     price: 480,
     badge: "Serialized",
@@ -101,6 +106,7 @@ export const products: Product[] = [
     name: "RS Carbon Rear Spoiler",
     partNo: "CF-AERO-964",
     category: "Exterior Aero",
+    productType: "Bespoke",
     material: "Carbon Fiber",
     price: 1850,
     badge: "Limited",
@@ -122,6 +128,7 @@ export const products: Product[] = [
     name: "Guards Red Gauge Cluster",
     partNo: "GR-GAUGE-911",
     category: "Interior Components",
+    productType: "OE aftermarket",
     material: "Composite Polymer",
     price: 1250,
     image:
@@ -141,7 +148,8 @@ export const products: Product[] = [
     slug: "rs-64-air-intake",
     name: "RS-64 Air Intake",
     partNo: "911-CF-INT-01",
-    category: "Performance Tuning",
+    category: "Performance parts",
+    productType: "Bespoke",
     material: "Carbon Fiber",
     price: 1850,
     image:
@@ -161,7 +169,8 @@ export const products: Product[] = [
     slug: "precision-short-shifter",
     name: "Precision Short Shifter",
     partNo: "911-SS-KNOB-05",
-    category: "Interior Components",
+    category: "OE aftermarket parts",
+    productType: "OE aftermarket",
     material: "Machined Metal",
     price: 620,
     image:
