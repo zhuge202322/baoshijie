@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const slides = [
   {
@@ -34,6 +34,16 @@ export function HeroCarousel() {
     setActive((index + slides.length) % slides.length);
   }, []);
 
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const timer = window.setTimeout(() => {
+      setActive((current) => (current + 1) % slides.length);
+    }, 6000);
+
+    return () => window.clearTimeout(timer);
+  }, [active]);
+
   const finishDrag = (clientX: number) => {
     if (dragStart.current === null) return;
     const distance = clientX - dragStart.current;
@@ -48,6 +58,7 @@ export function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label="Bespoke Elemental classic Porsche showcase"
       onPointerDown={(event) => {
+        if (event.button !== 0 || (event.target as HTMLElement).closest("button, a")) return;
         dragStart.current = event.clientX;
         event.currentTarget.setPointerCapture(event.pointerId);
       }}

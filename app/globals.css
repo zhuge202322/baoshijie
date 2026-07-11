@@ -457,17 +457,27 @@ img {
 }
 
 .carousel-dots button {
-  width: 36px;
-  height: 4px;
+  position: relative;
+  width: 44px;
+  height: 44px;
   border: 0;
   padding: 0;
-  background: rgba(255, 255, 255, 0.45);
+  display: grid;
+  place-items: center;
+  background: transparent;
   cursor: pointer;
+}
+
+.carousel-dots button::before {
+  content: "";
+  width: 32px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.45);
   transition: background 180ms ease, width 180ms ease;
 }
 
-.carousel-dots button.active {
-  width: 56px;
+.carousel-dots button.active::before {
+  width: 44px;
   background: var(--red);
 }
 
