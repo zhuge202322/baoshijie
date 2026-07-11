@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Globe2, Menu, ShoppingCart, X } from "lucide-react";
@@ -26,7 +25,7 @@ export function SiteNav() {
     <header className="nav-bar">
       <nav className="nav-inner" aria-label="Primary navigation">
         <Link className="logo-lockup" href="/" aria-label="Bespoke Elemental home">
-          <Image src="/brand/flame-logo.png" alt="" width={545} height={832} priority />
+          <img src="/brand/flame-logo.png" alt="" width={545} height={832} aria-hidden="true" />
           <span>Bespoke Elemental</span>
         </Link>
 
@@ -40,26 +39,30 @@ export function SiteNav() {
               {link.label}
             </Link>
           ))}
-          <div className="nav-dropdown" onMouseLeave={() => setProductOpen(false)}>
+          <div
+            className="nav-dropdown"
+            data-open={productOpen}
+            onMouseEnter={() => setProductOpen(true)}
+            onMouseLeave={() => setProductOpen(false)}
+          >
             <button
               type="button"
               aria-expanded={productOpen}
               aria-haspopup="menu"
+              onFocus={() => setProductOpen(true)}
               onClick={() => setProductOpen((value) => !value)}
             >
               Product
               <ChevronDown size={14} aria-hidden="true" />
             </button>
-            {productOpen && (
-              <div className="nav-dropdown-menu" role="menu">
-                <Link href="/catalog?type=bespoke" role="menuitem" onClick={() => setProductOpen(false)}>
-                  Bespoke products
-                </Link>
-                <Link href="/catalog?type=oe" role="menuitem" onClick={() => setProductOpen(false)}>
-                  OE aftermarket products
-                </Link>
-              </div>
-            )}
+            <div className="nav-dropdown-menu" role="menu">
+              <Link href="/catalog?type=bespoke" role="menuitem" onClick={() => setProductOpen(false)}>
+                Bespoke products
+              </Link>
+              <Link href="/catalog?type=oe" role="menuitem" onClick={() => setProductOpen(false)}>
+                OE aftermarket products
+              </Link>
+            </div>
           </div>
           {links.slice(3).map((link) => (
             <Link

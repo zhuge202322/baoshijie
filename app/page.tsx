@@ -68,8 +68,8 @@ export default function HomePage() {
             <div className="reveal" style={{ gridColumn: "span 6" }}>
               <div className="panel" style={{ overflow: "hidden" }}>
                 <img
-                  src="/images/carbonforge-hero.jpg"
-                  alt="Carbon fiber body panel in the Bespoke Elemental workshop"
+                  src="/images/bespoke-elemental/heritage-hero-hd.webp"
+                  alt="Carbon fiber bodywork with white and red accents"
                   style={{ width: "100%", height: "min(64vw, 640px)", objectFit: "cover" }}
                 />
               </div>

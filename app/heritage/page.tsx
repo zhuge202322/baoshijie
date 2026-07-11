@@ -65,9 +65,11 @@ export default function HeritagePage() {
             </div>
             <div className="reveal" style={{ gridColumn: "span 7" }}>
               <p className="muted" style={{ lineHeight: 1.78, fontSize: "1.08rem" }}>
-                We're actively providing exquisite parts for classic Porsche 911 both interior and
-                outside of the cars. Customed parts for restorations, upgradings, and OE aftermarket
-                substitutes are mianly within our focus.
+                CarbonForge builds components that feel native to the air-cooled era while using
+                current materials and manufacturing standards. We're actively providing exquisite
+                parts for classic Porsche 911 both interior and outside of the cars. Customed parts
+                for restorations, upgradings, and OE aftermarket substitutes are mianly within our
+                focus.
               </p>
             </div>
           </div>

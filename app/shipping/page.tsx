@@ -17,7 +17,7 @@ const details = [
   {
     icon: <Truck size={22} aria-hidden="true" />,
     title: "Delivery partners",
-    text: "We primarily ship with DHL, FedEx, and UPS. Contact us before ordering when you need a more economical shipping option."
+    text: "We primarily ship with DHL, FedEx, and UPS. If you need a lower-cost shipping option, contact us before ordering; we can also arrange more economical alternative carriers."
   }
 ];
 
