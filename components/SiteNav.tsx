@@ -26,7 +26,10 @@ export function SiteNav() {
       <nav className="nav-inner" aria-label="Primary navigation">
         <Link className="logo-lockup" href="/" aria-label="Bespoke Elemental home">
           <img src="/brand/flame-logo.png" alt="" width={545} height={832} aria-hidden="true" />
-          <span>Bespoke Elemental</span>
+          <span className="logo-wordmark">
+            <span className="logo-initial">B</span>espoke{" "}
+            <span className="logo-initial">E</span>lemental
+          </span>
         </Link>
 
         <div className="nav-links">

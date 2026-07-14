@@ -18,11 +18,6 @@ const slides = [
     image: "/images/bespoke-elemental/hero-03.png",
     alt: "Orange classic Porsche 911 Carrera viewed from the rear",
     copy: "Born from the grueling demands of GT racing carbon fiber maintenance and development, our expertise is now available to elevate your driving experience. We don't just supply parts; we craft the components that keep automotive legends alive."
-  },
-  {
-    image: "/images/bespoke-elemental/hero-04.png",
-    alt: "Orange classic Porsche 911 Carrera viewed from the front",
-    copy: ""
   }
 ];
 
