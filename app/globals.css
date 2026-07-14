@@ -209,7 +209,7 @@ img {
   color: inherit;
   background: transparent;
   cursor: pointer;
-  font-size: clamp(0.66rem, 0.72vw, 0.78rem);
+  font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
   transition: color 180ms ease;
@@ -398,7 +398,7 @@ img {
 .hero-carousel-copy {
   position: absolute;
   left: max(7vw, 64px);
-  bottom: clamp(100px, 15vh, 170px);
+  bottom: clamp(150px, 20vh, 190px);
   z-index: 2;
   width: min(660px, 52vw);
 }
@@ -407,7 +407,7 @@ img {
   margin: 0;
   color: #fff;
   font-family: "Hanken Grotesk", Inter, sans-serif;
-  font-size: clamp(1.25rem, 2.1vw, 2.35rem);
+  font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.2;
   text-wrap: balance;
@@ -1164,13 +1164,13 @@ img {
 
   .hero-carousel-copy {
     left: 24px;
-    bottom: 100px;
+    bottom: 150px;
     width: calc(100% - 48px);
   }
 
   .hero-carousel-copy p {
-    font-size: clamp(1.05rem, 5.2vw, 1.42rem);
-    line-height: 1.25;
+    font-size: 0.98rem;
+    line-height: 1.35;
   }
 
   .carousel-arrow {
