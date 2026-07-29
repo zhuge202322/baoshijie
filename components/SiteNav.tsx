@@ -21,6 +21,8 @@ export function SiteNav() {
   const [socialOpen, setSocialOpen] = useState(false);
   const { count } = useCart();
 
+  if (pathname.startsWith("/admin")) return null;
+
   return (
     <header className="nav-bar">
       <nav className="nav-inner" aria-label="Primary navigation">

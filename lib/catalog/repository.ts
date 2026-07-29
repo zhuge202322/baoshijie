@@ -227,3 +227,28 @@ export function archiveProduct(database: CommerceDatabase, id: string, archived:
     .run(archived ? 0 : 1, Date.now(), id);
   if (result.changes === 0) throw new Error("Product not found");
 }
+
+export function removeProduct(database: CommerceDatabase, id: string): "deleted" | "archived" {
+  database.exec("BEGIN IMMEDIATE");
+  try {
+    const references = Number(
+      database.prepare("SELECT COUNT(*) AS count FROM order_items WHERE product_id = ?").get(id)?.count || 0
+    );
+    if (references > 0) {
+      const result = database
+        .prepare("UPDATE products SET is_active = 0, updated_at = ? WHERE id = ?")
+        .run(Date.now(), id);
+      if (result.changes === 0) throw new Error("Product not found");
+      database.exec("COMMIT");
+      return "archived";
+    }
+
+    const result = database.prepare("DELETE FROM products WHERE id = ?").run(id);
+    if (result.changes === 0) throw new Error("Product not found");
+    database.exec("COMMIT");
+    return "deleted";
+  } catch (error) {
+    database.exec("ROLLBACK");
+    throw error;
+  }
+}

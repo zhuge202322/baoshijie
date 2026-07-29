@@ -9,6 +9,7 @@ import {
   getProductById,
   listCategories,
   listProducts,
+  removeProduct,
   updateProduct
 } from "../../lib/catalog/repository.ts";
 
@@ -84,6 +85,43 @@ test("catalog validation rejects invalid slugs and negative prices", () => {
     const current = getProductById(database, "product-billet-aluminum-pedals");
     assert.ok(current);
     assert.throws(() => updateProduct(database, current.id, { ...current, priceCents: -1 }), /non-negative integer/);
+  } finally {
+    database.close();
+  }
+});
+
+test("product removal deletes unused products and archives products referenced by orders", () => {
+  const database = setup();
+  try {
+    const unusedId = "product-billet-aluminum-pedals";
+    assert.equal(removeProduct(database, unusedId), "deleted");
+    assert.equal(getProductById(database, unusedId), null);
+
+    const orderedId = "product-carbon-fiber-heritage-steering-wheel";
+    database.prepare(`
+      INSERT INTO orders (
+        id, order_number, lookup_token_hash, status, payment_provider,
+        subtotal_cents, shipping_cents, total_cents, shipping_method,
+        email, phone, first_name, last_name, country_code, city, postal_code,
+        address_line_1, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      "order-test", "BE-TEST-1", "hash", "PAID", "paypal",
+      10000, 1200, 11200, "standard", "owner@example.com", "123",
+      "Test", "Owner", "US", "Los Angeles", "90001", "1 Main St", 1, 1
+    );
+    database.prepare(`
+      INSERT INTO order_items (
+        id, order_id, product_id, product_slug, part_no, name, quantity,
+        unit_price_cents, line_total_cents, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      "item-test", "order-test", orderedId, "heritage-steering-wheel", "BE-TEST",
+      "Heritage Steering Wheel", 1, 10000, 10000, 1
+    );
+
+    assert.equal(removeProduct(database, orderedId), "archived");
+    assert.equal(getProductById(database, orderedId)?.isActive, false);
   } finally {
     database.close();
   }
