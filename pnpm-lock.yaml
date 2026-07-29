@@ -9,50 +9,50 @@ importers:
   .:
     dependencies:
       '@react-three/drei':
-        specifier: latest
+        specifier: 10.7.7
         version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1)
       '@react-three/fiber':
-        specifier: latest
+        specifier: 9.6.1
         version: 9.6.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(three@0.185.1)
       gsap:
-        specifier: latest
+        specifier: 3.15.0
         version: 3.15.0
       lucide-react:
-        specifier: latest
+        specifier: 1.23.0
         version: 1.23.0(react@19.2.7)
       next:
-        specifier: latest
+        specifier: 16.2.10
         version: 16.2.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
-        specifier: latest
+        specifier: 19.2.7
         version: 19.2.7
       react-dom:
-        specifier: latest
+        specifier: 19.2.7
         version: 19.2.7(react@19.2.7)
       three:
-        specifier: latest
+        specifier: 0.185.1
         version: 0.185.1
     devDependencies:
       '@types/node':
-        specifier: latest
+        specifier: 26.1.0
         version: 26.1.0
       '@types/react':
-        specifier: latest
+        specifier: 19.2.17
         version: 19.2.17
       '@types/react-dom':
-        specifier: latest
+        specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.17)
       '@types/three':
-        specifier: latest
+        specifier: 0.185.0
         version: 0.185.0
       playwright:
-        specifier: latest
+        specifier: 1.61.1
         version: 1.61.1
       sharp:
-        specifier: latest
+        specifier: 0.35.3
         version: 0.35.3(@types/node@26.1.0)
       typescript:
-        specifier: latest
+        specifier: 6.0.3
         version: 6.0.3
 
 packages:
