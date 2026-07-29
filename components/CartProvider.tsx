@@ -11,6 +11,7 @@ export type CartLine = {
 type CartContextValue = {
   lines: CartLine[];
   items: Array<{ product: StorefrontProduct; quantity: number }>;
+  hydrated: boolean;
   count: number;
   subtotalCents: number;
   addItem: (slug: string) => void;
@@ -67,6 +68,7 @@ export function CartProvider({ children, products }: { children: React.ReactNode
     return {
       lines,
       items,
+      hydrated,
       count,
       subtotalCents,
       addItem: (slug) => {
@@ -94,7 +96,7 @@ export function CartProvider({ children, products }: { children: React.ReactNode
       },
       clear: () => setLines([])
     };
-  }, [items, lines]);
+  }, [hydrated, items, lines]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

@@ -1,217 +1,180 @@
 "use client";
 
-import { CreditCard, LockKeyhole, ShieldCheck, Truck } from "lucide-react";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { LockKeyhole, PackageOpen, ShieldCheck, Truck } from "lucide-react";
+import { FormEvent, useMemo, useState } from "react";
 import { useCart } from "@/components/CartProvider";
+import { AirwallexCheckout } from "@/components/checkout/AirwallexCheckout";
+import { PaymentSelector } from "@/components/checkout/PaymentSelector";
+import { PayPalCheckout } from "@/components/checkout/PayPalCheckout";
+import type { CheckoutSession, PaymentConfig } from "@/components/checkout/types";
+import { checkoutCountries } from "@/lib/checkout/countries";
 import { formatUsd } from "@/lib/catalog/model";
 
 const shippingOptions = [
-  { id: "standard", label: "Standard Shipping", detail: "5-7 Business Days", priceCents: 1200 },
-  { id: "expedited", label: "Premium Expedited Air", detail: "2-4 Business Days", priceCents: 4500 }
+  { id: "standard" as const, label: "Standard Shipping", detail: "5-7 business days", priceCents: 1200 },
+  { id: "expedited" as const, label: "Premium Expedited Air", detail: "2-4 business days", priceCents: 4500 }
 ];
 
-export function CheckoutClient() {
-  const { items, subtotalCents } = useCart();
-  const [shipping, setShipping] = useState(shippingOptions[0]);
-  const totalCents = useMemo(() => subtotalCents + shipping.priceCents, [shipping.priceCents, subtotalCents]);
+export function CheckoutClient({ paymentConfig }: { paymentConfig: PaymentConfig }) {
+  const { items, lines, subtotalCents, hydrated } = useCart();
+  const [shippingMethod, setShippingMethod] = useState<"standard" | "expedited">("standard");
+  const [countryCode, setCountryCode] = useState("US");
+  const [paymentProvider, setPaymentProvider] = useState<"paypal" | "airwallex" | "">(
+    paymentConfig.paypal.available ? "paypal" : paymentConfig.airwallex.available ? "airwallex" : ""
+  );
+  const [session, setSession] = useState<CheckoutSession | null>(null);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState("");
+  const selectedShipping = shippingOptions.find((option) => option.id === shippingMethod) || shippingOptions[0];
+  const displayTotals = session?.totals || {
+    currency: "USD" as const,
+    subtotalCents,
+    shippingCents: selectedShipping.priceCents,
+    totalCents: subtotalCents + selectedShipping.priceCents
+  };
+  const requiresRegion = countryCode === "US" || countryCode === "CA";
+  const providersAvailable = paymentConfig.paypal.available || paymentConfig.airwallex.available;
+  const orderButton = paymentProvider === "paypal" ? "Continue to PayPal" : "Continue to secure card payment";
+
+  async function createOrder(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!paymentProvider || pending || session) return;
+    setPending(true);
+    setError("");
+    const data = new FormData(event.currentTarget);
+    try {
+      const response = await fetch("/api/checkout/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lines,
+          shippingMethod,
+          paymentProvider,
+          customer: {
+            email: data.get("email"),
+            phone: data.get("phone"),
+            firstName: data.get("firstName"),
+            lastName: data.get("lastName"),
+            countryCode: data.get("countryCode"),
+            region: data.get("region"),
+            city: data.get("city"),
+            postalCode: data.get("postalCode"),
+            addressLine1: data.get("addressLine1"),
+            addressLine2: data.get("addressLine2"),
+            customerNote: data.get("customerNote")
+          }
+        })
+      });
+      const body = await response.json() as CheckoutSession & { error?: string };
+      if (!response.ok) throw new Error(body.error || "Order could not be created");
+      setSession(body);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Order could not be created");
+    } finally {
+      setPending(false);
+    }
+  }
+
+  const itemCount = useMemo(() => items.reduce((sum, item) => sum + item.quantity, 0), [items]);
+
+  if (!hydrated) return <div className="container section checkout-loading" aria-live="polite">Loading checkout...</div>;
+  if (items.length === 0) {
+    return (
+      <div className="container section checkout-empty">
+        <PackageOpen size={34} aria-hidden="true" />
+        <h1 className="headline">Your cart is empty</h1>
+        <p className="muted">Add a component before starting checkout.</p>
+        <Link className="button primary mono" href="/catalog">Browse catalog</Link>
+      </div>
+    );
+  }
 
   return (
-    <div className="container section">
-      <div className="grid-12">
-        <div style={{ gridColumn: "span 7" }}>
-          <div className="reveal" style={{ display: "grid", gap: 44 }}>
-            <CheckoutStep number="01" title="Shipping Details">
-              <div className="form-grid">
-                <Field label="First Name" defaultValue="Ferdinand" />
-                <Field label="Last Name" defaultValue="Porsche" />
-                <Field label="Address" defaultValue="Porscheplatz 1" wide />
-                <Field label="City" defaultValue="Stuttgart" />
-                <Field label="Postal Code" defaultValue="70435" />
-              </div>
-            </CheckoutStep>
+    <div className="container section checkout-page">
+      <header className="checkout-header"><p className="eyebrow">Guest checkout</p><h1 className="display">Secure Checkout</h1><p className="muted">{itemCount} items · USD</p></header>
+      <form className="checkout-layout" onSubmit={createOrder}>
+        <div className="checkout-details" aria-disabled={Boolean(session)}>
+          <CheckoutSection number="01" title="Contact and delivery">
+            <div className="checkout-fields">
+              <Field label="Email" name="email" type="email" autoComplete="email" required disabled={Boolean(session)} />
+              <Field label="Phone" name="phone" type="tel" autoComplete="tel" required disabled={Boolean(session)} />
+              <Field label="First name" name="firstName" autoComplete="given-name" required disabled={Boolean(session)} />
+              <Field label="Last name" name="lastName" autoComplete="family-name" required disabled={Boolean(session)} />
+              <label className="checkout-field checkout-field-wide">Country or region
+                <select name="countryCode" value={countryCode} onChange={(event) => setCountryCode(event.target.value)} disabled={Boolean(session)} required>
+                  <option value="" disabled>Select destination</option>
+                  {checkoutCountries.map((country) => <option key={country.code} value={country.code}>{country.name}</option>)}
+                </select>
+              </label>
+              <Field label="Address" name="addressLine1" autoComplete="address-line1" required wide disabled={Boolean(session)} />
+              <Field label="Apartment, suite, etc." name="addressLine2" autoComplete="address-line2" wide disabled={Boolean(session)} />
+              <Field label="City" name="city" autoComplete="address-level2" required disabled={Boolean(session)} />
+              <Field label={countryCode === "US" ? "State" : countryCode === "CA" ? "Province" : "Region"} name="region" autoComplete="address-level1" required={requiresRegion} disabled={Boolean(session)} />
+              <Field label="Postal code" name="postalCode" autoComplete="postal-code" required disabled={Boolean(session)} />
+              <label className="checkout-field checkout-field-wide">Order note<textarea name="customerNote" rows={3} maxLength={2000} disabled={Boolean(session)} /></label>
+            </div>
+          </CheckoutSection>
 
-            <CheckoutStep number="02" title="Delivery Logistics">
-              <div style={{ display: "grid", gap: 14 }}>
-                {shippingOptions.map((option) => (
-                  <button
-                    key={option.label}
-                    type="button"
-                    className="panel"
-                    onClick={() => setShipping(option)}
-                    style={{
-                      minHeight: 92,
-                      padding: "18px 22px",
-                      display: "grid",
-                      gridTemplateColumns: "auto 1fr auto",
-                      gap: 18,
-                      alignItems: "center",
-                      color: "#f1eeee",
-                      cursor: "pointer",
-                      borderColor: shipping.label === option.label ? "#d5001c" : "rgba(126,90,86,.34)"
-                    }}
-                  >
-                    <span
-                      aria-hidden="true"
-                      style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: 999,
-                        border: "1px solid #7e5a56",
-                        background: shipping.label === option.label ? "#d5001c" : "transparent"
-                      }}
-                    />
-                    <span style={{ textAlign: "left" }}>
-                      <strong>{option.label}</strong>
-                      <span className="muted" style={{ display: "block", marginTop: 6 }}>
-                        {option.detail} / Insured Tracking
-                      </span>
-                    </span>
-                    <strong>{formatUsd(option.priceCents)}</strong>
-                  </button>
-                ))}
-              </div>
-            </CheckoutStep>
+          <CheckoutSection number="02" title="Shipping">
+            <div className="checkout-shipping-options">
+              {shippingOptions.map((option) => (
+                <label key={option.id} className={shippingMethod === option.id ? "is-selected" : ""}>
+                  <input type="radio" name="shippingMethod" value={option.id} checked={shippingMethod === option.id} onChange={() => setShippingMethod(option.id)} disabled={Boolean(session)} />
+                  <span><strong>{option.label}</strong><small>{option.detail} · tracked delivery</small></span>
+                  <strong>{formatUsd(option.priceCents)}</strong>
+                </label>
+              ))}
+            </div>
+          </CheckoutSection>
 
-            <CheckoutStep number="03" title="Payment Method">
-              <div className="panel panel-pad">
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 28 }}>
-                  <strong className="mono" style={{ textTransform: "uppercase" }}>
-                    Credit or Debit Card
-                  </strong>
-                  <CreditCard size={22} color="#ffb3ac" aria-hidden="true" />
-                </div>
-                <div className="form-grid">
-                  <Field label="Card Number" defaultValue="4242 4242 4242 4242" wide />
-                  <Field label="Expiry" defaultValue="09 / 29" />
-                  <Field label="CVC" defaultValue="911" />
-                </div>
+          <CheckoutSection number="03" title="Payment">
+            <PaymentSelector config={paymentConfig} value={paymentProvider} onChange={setPaymentProvider} disabled={Boolean(session)} />
+            {!providersAvailable ? <p className="checkout-provider-note">Payment providers are not configured yet. Checkout will become available after server credentials are added.</p> : null}
+            {error ? <p className="checkout-error" role="alert">{error}</p> : null}
+            {!session ? (
+              <button className="button primary mono checkout-submit" type="submit" disabled={!paymentProvider || pending}>
+                <LockKeyhole size={17} aria-hidden="true" />{pending ? "Creating secure order..." : orderButton}
+              </button>
+            ) : (
+              <div className="checkout-hosted-stage">
+                <p className="mono">Order {session.orderNumber}</p>
+                {session.paymentProvider === "paypal" ? <PayPalCheckout session={session} clientId={paymentConfig.paypal.clientId} /> : null}
+                {session.paymentProvider === "airwallex" ? <AirwallexCheckout session={session} environment={paymentConfig.airwallex.environment} /> : null}
               </div>
-            </CheckoutStep>
-          </div>
+            )}
+          </CheckoutSection>
         </div>
 
-        <aside className="panel panel-pad reveal" style={{ gridColumn: "span 5", alignSelf: "start" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-            <LockKeyhole size={20} color="#ffb3ac" aria-hidden="true" />
-            <h1 className="headline" style={{ margin: 0, fontSize: "1.55rem" }}>
-              Secure Checkout
-            </h1>
+        <aside className="checkout-summary">
+          <div className="checkout-summary-title"><LockKeyhole size={19} aria-hidden="true" /><h2>Order summary</h2></div>
+          <div className="checkout-summary-items">{items.map(({ product, quantity }) => (
+            <div key={product.slug} className="checkout-summary-item">
+              <img src={product.image} alt="" />
+              <span><strong>{product.name}</strong><small>{product.partNo} · Qty {quantity}</small></span>
+              <strong>{formatUsd(product.priceCents * quantity)}</strong>
+            </div>
+          ))}</div>
+          <div className="checkout-totals">
+            <Summary label="Subtotal" value={formatUsd(displayTotals.subtotalCents)} />
+            <Summary label="Shipping" value={formatUsd(displayTotals.shippingCents)} />
+            <Summary label="Total" value={formatUsd(displayTotals.totalCents)} large />
           </div>
-
-          <div style={{ display: "grid", gap: 20 }}>
-            {items.map(({ product, quantity }) => (
-              <div key={product.slug} style={{ display: "grid", gridTemplateColumns: "96px 1fr auto", gap: 16 }}>
-                <div className="product-image" style={{ aspectRatio: "1 / 1" }}>
-                  <img src={product.image} alt={product.name} />
-                </div>
-                <div>
-                  <p className="eyebrow" style={{ margin: "0 0 6px" }}>
-                    Part {product.partNo}
-                  </p>
-                  <strong className="headline" style={{ fontSize: "1rem" }}>
-                    {product.name}
-                  </strong>
-                  <p className="muted mono" style={{ margin: "8px 0 0", fontSize: 12 }}>
-                    Qty: {quantity}
-                  </p>
-                </div>
-                <strong>{formatUsd(product.priceCents * quantity)}</strong>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ borderTop: "1px solid rgba(126,90,86,.32)", marginTop: 28, paddingTop: 24 }}>
-            <Summary label="Subtotal" value={formatUsd(subtotalCents)} />
-            <Summary label="Shipping" value={formatUsd(shipping.priceCents)} />
-            <Summary label="Total" value={formatUsd(totalCents)} large />
-          </div>
-
-          <button className="button primary mono" type="button" style={{ width: "100%", marginTop: 24 }}>
-            Complete Acquisition
-          </button>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 10,
-              marginTop: 28,
-              color: "#c9b8b6"
-            }}
-          >
-            <Trust icon={<ShieldCheck size={18} aria-hidden="true" />} label="Secured" />
-            <Trust icon={<CreditCard size={18} aria-hidden="true" />} label="Precision" />
-            <Trust icon={<Truck size={18} aria-hidden="true" />} label="Insured" />
-          </div>
+          <div className="checkout-trust"><span><ShieldCheck size={17} /> Hosted payment</span><span><Truck size={17} /> Tracked shipping</span></div>
         </aside>
-      </div>
+      </form>
     </div>
   );
 }
 
-function CheckoutStep({
-  number,
-  title,
-  children
-}: {
-  number: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section>
-      <h2 className="headline" style={{ display: "flex", alignItems: "center", gap: 14, margin: "0 0 22px" }}>
-        <span
-          className="mono"
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: 999,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#fff",
-            background: "#353534",
-            border: "1px solid #7e5a56",
-            fontSize: 13
-          }}
-        >
-          {number}
-        </span>
-        {title}
-      </h2>
-      {children}
-    </section>
-  );
+function CheckoutSection({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
+  return <section className="checkout-section"><div className="checkout-section-title"><span className="mono">{number}</span><h2>{title}</h2></div>{children}</section>;
 }
 
-function Field({ label, defaultValue, wide = false }: { label: string; defaultValue: string; wide?: boolean }) {
-  return (
-    <div className="field" style={{ gridColumn: wide ? "1 / -1" : undefined }}>
-      <label>{label}</label>
-      <input defaultValue={defaultValue} />
-    </div>
-  );
+function Field({ label, name, wide, ...props }: { label: string; name: string; wide?: boolean } & React.InputHTMLAttributes<HTMLInputElement>) {
+  return <label className={`checkout-field ${wide ? "checkout-field-wide" : ""}`}>{label}<input name={name} {...props} /></label>;
 }
 
-function Summary({ label, value, large = false }: { label: string; value: string; large?: boolean }) {
-  return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: 16, marginBottom: 16 }}>
-      <span className={large ? "headline" : "muted"}>{label}</span>
-      <strong className={large ? "price" : undefined} style={{ fontSize: large ? "1.6rem" : undefined }}>
-        {value}
-      </strong>
-    </div>
-  );
-}
-
-function Trust({ icon, label }: { icon: React.ReactNode; label: string }) {
-  return (
-    <div style={{ minHeight: 58, display: "grid", placeItems: "center", border: "1px solid rgba(126,90,86,.18)" }}>
-      {icon}
-      <span className="mono" style={{ fontSize: 10, textTransform: "uppercase" }}>
-        {label}
-      </span>
-    </div>
-  );
+function Summary({ label, value, large }: { label: string; value: string; large?: boolean }) {
+  return <div className={large ? "is-total" : ""}><span>{label}</span><strong>{value}</strong></div>;
 }
