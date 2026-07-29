@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test \"tests/**/*.test.ts\"",
     "db:init": "node scripts/db-init.ts",
-    "db:seed": "node scripts/db-init.ts --seed"
+    "db:seed": "node scripts/db-init.ts --seed",
+    "admin:hash": "node scripts/hash-admin-password.ts"
   },
   "dependencies": {
     "@react-three/drei": "10.7.7",
