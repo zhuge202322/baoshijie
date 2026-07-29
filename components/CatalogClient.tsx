@@ -2,10 +2,9 @@
 
 import { SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
-import { Product, products } from "@/data/products";
 import { ProductCard } from "@/components/ProductCard";
+import type { StorefrontProduct } from "@/lib/catalog/model";
 
-const categories = ["Exterior Aero", "Interior Components", "Performance parts", "OE aftermarket parts"] as const;
 const vehicles = [
   "Porsche 911 (993)",
   "Porsche 911 (964)",
@@ -15,15 +14,16 @@ const vehicles = [
 ] as const;
 
 export function CatalogClient({
-  featured = products,
+  featured,
   initialType
 }: {
-  featured?: Product[];
-  initialType?: Product["productType"];
+  featured: StorefrontProduct[];
+  initialType?: StorefrontProduct["productType"];
 }) {
   const [category, setCategory] = useState<string | null>(null);
   const [vehicle, setVehicle] = useState<string>(vehicles[0]);
   const [query, setQuery] = useState("");
+  const categories = useMemo(() => [...new Set(featured.map((product) => product.category))].sort(), [featured]);
 
   const filtered = useMemo(() => {
     return featured.filter((product) => {

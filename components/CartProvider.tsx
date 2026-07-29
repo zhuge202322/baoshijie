@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { Product, getProduct } from "@/data/products";
+import type { StorefrontProduct } from "@/lib/catalog/model";
 
 export type CartLine = {
   slug: string;
@@ -10,9 +10,9 @@ export type CartLine = {
 
 type CartContextValue = {
   lines: CartLine[];
-  items: Array<{ product: Product; quantity: number }>;
+  items: Array<{ product: StorefrontProduct; quantity: number }>;
   count: number;
-  subtotal: number;
+  subtotalCents: number;
   addItem: (slug: string) => void;
   removeItem: (slug: string) => void;
   setQuantity: (slug: string, quantity: number) => void;
@@ -21,29 +21,27 @@ type CartContextValue = {
 
 const storageKey = "carbonforge-cart";
 
-const defaultLines: CartLine[] = [
-  { slug: "rs-64-air-intake", quantity: 1 },
-  { slug: "precision-short-shifter", quantity: 1 }
-];
+const defaultLines: CartLine[] = [];
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ children, products }: { children: React.ReactNode; products: StorefrontProduct[] }) {
   const [lines, setLines] = useState<CartLine[]>(defaultLines);
   const [hydrated, setHydrated] = useState(false);
+  const productMap = useMemo(() => new Map(products.map((product) => [product.slug, product])), [products]);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(storageKey);
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as CartLine[];
-        setLines(parsed.filter((line) => getProduct(line.slug) && line.quantity > 0));
+        setLines(parsed.filter((line) => productMap.has(line.slug) && line.quantity > 0 && line.quantity <= 9));
       } catch {
         setLines(defaultLines);
       }
     }
     setHydrated(true);
-  }, []);
+  }, [productMap]);
 
   useEffect(() => {
     if (hydrated) {
@@ -55,28 +53,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     () =>
       lines
         .map((line) => {
-          const product = getProduct(line.slug);
+          const product = productMap.get(line.slug);
           return product ? { product, quantity: line.quantity } : null;
         })
-        .filter(Boolean) as Array<{ product: Product; quantity: number }>,
-    [lines]
+        .filter(Boolean) as Array<{ product: StorefrontProduct; quantity: number }>,
+    [lines, productMap]
   );
 
   const value = useMemo<CartContextValue>(() => {
     const count = items.reduce((sum, item) => sum + item.quantity, 0);
-    const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    const subtotalCents = items.reduce((sum, item) => sum + item.product.priceCents * item.quantity, 0);
 
     return {
       lines,
       items,
       count,
-      subtotal,
+      subtotalCents,
       addItem: (slug) => {
         setLines((current) => {
           const existing = current.find((line) => line.slug === slug);
           if (existing) {
             return current.map((line) =>
-              line.slug === slug ? { ...line, quantity: line.quantity + 1 } : line
+              line.slug === slug ? { ...line, quantity: Math.min(9, line.quantity + 1) } : line
             );
           }
           return [...current, { slug, quantity: 1 }];

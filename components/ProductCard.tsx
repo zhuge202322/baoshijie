@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { Product, formatCurrency } from "@/data/products";
 import { useCart } from "@/components/CartProvider";
+import { formatUsd, type StorefrontProduct } from "@/lib/catalog/model";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: StorefrontProduct }) {
   const { addItem } = useCart();
 
   return (
@@ -28,7 +28,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.short}
         </p>
         <div className="price-row">
-          <span className="price">{formatCurrency(product.price)}</span>
+          <span className="price">{formatUsd(product.priceCents)}</span>
           <button
             className="button primary mono"
             type="button"

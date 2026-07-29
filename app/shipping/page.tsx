@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Clock3, PackageCheck, Truck } from "lucide-react";
 import { AnimatedShell } from "@/components/AnimatedShell";
 import { Footer } from "@/components/Footer";
+import { getMediaMap } from "@/lib/catalog/storefront";
+import { getDatabase } from "@/lib/db/client";
 
 const details = [
   {
@@ -22,10 +24,11 @@ const details = [
 ];
 
 export default function ShippingPage() {
+  const hero = getMediaMap(getDatabase())["shipping.hero"];
   return (
     <AnimatedShell>
       <main>
-        <section className="shipping-hero section">
+        <section className="shipping-hero section" style={{ backgroundImage: `linear-gradient(180deg, rgba(5, 5, 5, 0.2), rgba(5, 5, 5, 0.9)), url('${hero?.imageUrl || "/images/bespoke-elemental/about-06.png"}')` }}>
           <div className="container reveal">
             <p className="eyebrow">Support</p>
             <h1 className="display">Shipping</h1>

@@ -2,7 +2,7 @@
 
 import { Check, Wrench } from "lucide-react";
 import { useMemo, useState } from "react";
-import { formatCurrency } from "@/data/products";
+import { formatUsd } from "@/lib/catalog/model";
 
 const chassis = ["911 Carrera", "930 Turbo", "964 Classic", "993 RS"];
 const materials = [
@@ -73,7 +73,7 @@ export function BuildConfigurator() {
                   Commission Estimate
                 </p>
                 <strong className="headline" style={{ fontSize: "2rem" }}>
-                  {formatCurrency(total)}
+                  {formatUsd(total * 100)}
                 </strong>
                 <p className="muted mono" style={{ margin: "8px 0 0", fontSize: 12 }}>
                   {selectedChassis} / {selectedMaterial.label} / {selectedTrim.label}

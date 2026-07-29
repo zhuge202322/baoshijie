@@ -14,7 +14,15 @@ const links = [
   { href: "/#contact-us", label: "Contact Us" }
 ];
 
-export function SiteNav() {
+export function SiteNav({
+  websiteName,
+  logoUrl,
+  socialLinks
+}: {
+  websiteName: string;
+  logoUrl: string;
+  socialLinks: Array<{ id: string; label: string; url: string }>;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [productOpen, setProductOpen] = useState(false);
@@ -26,11 +34,12 @@ export function SiteNav() {
   return (
     <header className="nav-bar">
       <nav className="nav-inner" aria-label="Primary navigation">
-        <Link className="logo-lockup" href="/" aria-label="Bespoke Elemental home">
-          <img src="/brand/flame-logo.png" alt="" width={545} height={832} aria-hidden="true" />
+        <Link className="logo-lockup" href="/" aria-label={`${websiteName} home`}>
+          <img src={logoUrl} alt="" width={545} height={832} aria-hidden="true" />
           <span className="logo-wordmark">
-            <span className="logo-initial">B</span>espoke{" "}
-            <span className="logo-initial">E</span>lemental
+            {websiteName.split(/\s+/).map((word, index) => (
+              <span key={`${word}-${index}`}><span className="logo-initial">{word[0]}</span>{word.slice(1)}{index < websiteName.split(/\s+/).length - 1 ? " " : ""}</span>
+            ))}
           </span>
         </Link>
 
@@ -93,14 +102,9 @@ export function SiteNav() {
             >
               <Globe2 size={22} aria-hidden="true" />
             </button>
-            {socialOpen && (
+            {socialOpen && socialLinks.length > 0 && (
               <div className="social-menu" role="menu">
-                <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" role="menuitem">
-                  Instagram
-                </a>
-                <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" role="menuitem">
-                  Facebook
-                </a>
+                {socialLinks.map((link) => <a key={link.id} href={link.url} target="_blank" rel="noreferrer" role="menuitem">{link.label}</a>)}
               </div>
             )}
           </div>

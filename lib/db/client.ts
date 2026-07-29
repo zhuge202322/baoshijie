@@ -1,6 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
+import { seedDatabase } from "./seed.ts";
 
 const schema = `
 CREATE TABLE IF NOT EXISTS categories (
@@ -194,6 +195,7 @@ export function getDatabase() {
     const filename = process.env.DATABASE_PATH || resolve(process.cwd(), "storage", "baoshijie.sqlite");
     const database = createDatabase(filename);
     migrateDatabase(database);
+    seedDatabase(database);
     globalDatabase.__commerceDatabase = database;
   }
   return globalDatabase.__commerceDatabase;

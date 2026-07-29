@@ -5,17 +5,17 @@ import { AddToCartButton } from "@/components/AddToCartButton";
 import { AnimatedShell } from "@/components/AnimatedShell";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
-import { formatCurrency, getProduct, products } from "@/data/products";
-
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.slug }));
-}
+import { formatUsd } from "@/lib/catalog/model";
+import { getStorefrontProduct, listStorefrontProducts } from "@/lib/catalog/storefront";
+import { getDatabase } from "@/lib/db/client";
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const product = getProduct(slug);
+  const database = getDatabase();
+  const product = getStorefrontProduct(database, slug);
   if (!product) notFound();
 
+  const products = listStorefrontProducts(database);
   const related = products.filter((item) => item.slug !== product.slug).slice(0, 3);
 
   return (
@@ -50,7 +50,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <h1 className="display">{product.name}</h1>
             <p>{product.description}</p>
             <div className="hero-actions">
-              <AddToCartButton slug={product.slug} label={`Add ${formatCurrency(product.price)}`} />
+              <AddToCartButton slug={product.slug} label={`Add ${formatUsd(product.priceCents)}`} />
               <Link className="button ghost mono" href="/checkout">
                 Reserve Build Slot
               </Link>

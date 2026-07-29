@@ -1,17 +1,28 @@
 import Link from "next/link";
+import { getStorefrontContent } from "@/lib/catalog/storefront";
+import { getDatabase } from "@/lib/db/client";
 
 export function Footer() {
+  const { settings, socialLinks } = getStorefrontContent(getDatabase());
+  const connect = [
+    ...socialLinks.map((link) => ({ label: link.label, href: link.url })),
+    ...(settings.supportEmail ? [{ label: settings.supportEmail, href: `mailto:${settings.supportEmail}` }] : []),
+    ...(settings.supportPhone ? [{ label: settings.supportPhone, href: `tel:${settings.supportPhone.replace(/[^+\d]/g, "")}` }] : []),
+    ...(settings.supportWhatsapp ? [{ label: "WhatsApp", href: `https://wa.me/${settings.supportWhatsapp.replace(/\D/g, "")}` }] : []),
+    { label: "Contact Us", href: "/#contact-us" }
+  ];
   return (
     <footer id="contact-us" style={{ borderTop: "1px solid rgba(126,90,86,.28)", background: "#0b0b0b" }}>
       <div className="container footer-grid">
         <div>
           <div className="headline" style={{ fontSize: "1.8rem", color: "#8f8381", marginBottom: 18 }}>
-            Bespoke Elemental
+            {settings.websiteName}
           </div>
           <p className="footer-slogan">Refine the Soul of the 911.</p>
           <p className="muted" style={{ maxWidth: 420, lineHeight: 1.65 }}>
             Precision engineered carbon fiber, plastic composite, and metal components for the discerning classic Porsche enthusiast.
           </p>
+          {settings.companyAddress ? <p className="muted mono" style={{ maxWidth: 420, marginTop: 16, fontSize: 12, lineHeight: 1.6 }}>{settings.companyAddress}</p> : null}
         </div>
         <FooterColumn
           title="Explore"
@@ -39,15 +50,11 @@ export function Footer() {
         />
         <FooterColumn
           title="Connect"
-          links={[
-            { label: "Instagram", href: "https://www.instagram.com/" },
-            { label: "Facebook", href: "https://www.facebook.com/" },
-            { label: "Contact Us", href: "/#contact-us" }
-          ]}
+          links={connect}
         />
       </div>
       <div className="container mono muted" style={{ borderTop: "1px solid rgba(126,90,86,.16)", padding: "22px 0", fontSize: 12 }}>
-        2026 Bespoke Elemental. Precision components for heritage performance builds.
+        2026 {settings.websiteName}. Precision components for heritage performance builds.
       </div>
     </footer>
   );

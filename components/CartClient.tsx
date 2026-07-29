@@ -3,12 +3,10 @@
 import Link from "next/link";
 import { Minus, Plus, ShieldCheck, Trash2, Truck } from "lucide-react";
 import { useCart } from "@/components/CartProvider";
-import { formatCurrency } from "@/data/products";
+import { formatUsd } from "@/lib/catalog/model";
 
 export function CartClient() {
-  const { items, subtotal, setQuantity, removeItem } = useCart();
-  const tax = subtotal * 0.08;
-  const total = subtotal + tax;
+  const { items, subtotalCents, setQuantity, removeItem } = useCart();
 
   return (
     <div className="container section">
@@ -84,7 +82,7 @@ export function CartClient() {
                     </div>
                   </div>
                   <div style={{ display: "grid", gap: 18, justifyItems: "end" }}>
-                    <strong className="price">{formatCurrency(product.price * quantity)}</strong>
+                    <strong className="price">{formatUsd(product.priceCents * quantity)}</strong>
                     <button
                       className="button ghost mono"
                       type="button"
@@ -105,11 +103,10 @@ export function CartClient() {
           <h2 className="headline" style={{ margin: "0 0 24px", fontSize: "1.5rem" }}>
             Spec Summary
           </h2>
-          <SummaryLine label="Subtotal" value={formatCurrency(subtotal)} />
-          <SummaryLine label="Estimated Tax" value={formatCurrency(tax)} />
-          <SummaryLine label="Expedited Shipping" value="Free" />
+          <SummaryLine label="Subtotal" value={formatUsd(subtotalCents)} />
+          <SummaryLine label="Shipping" value="Calculated at checkout" />
           <div style={{ borderTop: "1px solid rgba(126,90,86,.32)", marginTop: 20, paddingTop: 24 }}>
-            <SummaryLine label="Total" value={formatCurrency(total)} large />
+            <SummaryLine label="Total" value={formatUsd(subtotalCents)} large />
           </div>
           <Link className="button primary mono" href="/checkout" style={{ width: "100%", marginTop: 28 }}>
             Secure Checkout

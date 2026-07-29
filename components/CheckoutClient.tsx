@@ -3,17 +3,17 @@
 import { CreditCard, LockKeyhole, ShieldCheck, Truck } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useCart } from "@/components/CartProvider";
-import { formatCurrency } from "@/data/products";
+import { formatUsd } from "@/lib/catalog/model";
 
 const shippingOptions = [
-  { label: "Premium Expedited Air", detail: "2-4 Business Days", price: 45 },
-  { label: "Standard Ground", detail: "5-7 Business Days", price: 12 }
+  { id: "standard", label: "Standard Shipping", detail: "5-7 Business Days", priceCents: 1200 },
+  { id: "expedited", label: "Premium Expedited Air", detail: "2-4 Business Days", priceCents: 4500 }
 ];
 
 export function CheckoutClient() {
-  const { items, subtotal } = useCart();
+  const { items, subtotalCents } = useCart();
   const [shipping, setShipping] = useState(shippingOptions[0]);
-  const total = useMemo(() => subtotal + shipping.price, [shipping.price, subtotal]);
+  const totalCents = useMemo(() => subtotalCents + shipping.priceCents, [shipping.priceCents, subtotalCents]);
 
   return (
     <div className="container section">
@@ -66,7 +66,7 @@ export function CheckoutClient() {
                         {option.detail} / Insured Tracking
                       </span>
                     </span>
-                    <strong>{formatCurrency(option.price)}</strong>
+                    <strong>{formatUsd(option.priceCents)}</strong>
                   </button>
                 ))}
               </div>
@@ -115,16 +115,15 @@ export function CheckoutClient() {
                     Qty: {quantity}
                   </p>
                 </div>
-                <strong>{formatCurrency(product.price * quantity)}</strong>
+                <strong>{formatUsd(product.priceCents * quantity)}</strong>
               </div>
             ))}
           </div>
 
           <div style={{ borderTop: "1px solid rgba(126,90,86,.32)", marginTop: 28, paddingTop: 24 }}>
-            <Summary label="Subtotal" value={formatCurrency(subtotal)} />
-            <Summary label="Shipping" value={formatCurrency(shipping.price)} />
-            <Summary label="Tax" value="$0" />
-            <Summary label="Total" value={formatCurrency(total)} large />
+            <Summary label="Subtotal" value={formatUsd(subtotalCents)} />
+            <Summary label="Shipping" value={formatUsd(shipping.priceCents)} />
+            <Summary label="Total" value={formatUsd(totalCents)} large />
           </div>
 
           <button className="button primary mono" type="button" style={{ width: "100%", marginTop: 24 }}>

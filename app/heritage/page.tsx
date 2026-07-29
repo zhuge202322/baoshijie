@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ArrowRight, Crosshair, Hammer, Layers3, Ruler } from "lucide-react";
 import { AnimatedShell } from "@/components/AnimatedShell";
 import { Footer } from "@/components/Footer";
+import { getMediaMap } from "@/lib/catalog/storefront";
+import { getDatabase } from "@/lib/db/client";
 
 const principles = [
   {
@@ -27,6 +29,7 @@ const principles = [
 ];
 
 export default function HeritagePage() {
+  const hero = getMediaMap(getDatabase())["heritage.hero"];
   return (
     <AnimatedShell>
       <main>
@@ -34,8 +37,7 @@ export default function HeritagePage() {
           className="hero-section"
           style={{
             minHeight: "72dvh",
-            backgroundImage:
-              "linear-gradient(180deg, rgba(5,5,5,.2), rgba(5,5,5,.9)), url('/images/bespoke-elemental/heritage-hero-hd.webp')",
+            backgroundImage: `linear-gradient(180deg, rgba(5,5,5,.2), rgba(5,5,5,.9)), url('${hero?.imageUrl || "/images/bespoke-elemental/heritage-hero-hd.webp"}')`,
             backgroundSize: "cover",
             backgroundPosition: "center 42%"
           }}

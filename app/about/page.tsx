@@ -1,5 +1,7 @@
 import { AnimatedShell } from "@/components/AnimatedShell";
 import { Footer } from "@/components/Footer";
+import { getMediaMap } from "@/lib/catalog/storefront";
+import { getDatabase } from "@/lib/db/client";
 
 const sections = [
   {
@@ -16,23 +18,18 @@ const sections = [
   }
 ];
 
-const images = Array.from({ length: 6 }, (_, index) => ({
-  src: `/images/bespoke-elemental/about-0${index + 1}.png`,
-  alt: [
-    "Carbon fiber components and composite materials in the Bespoke Elemental workshop",
-    "Carbon fiber process excellence in an autoclave workshop",
-    "Carbon fiber component designed in precision CAD software",
-    "Composite production tools, molds, and racing parts",
-    "Carbon fiber interior components and workshop materials",
-    "Advanced carbon fiber production equipment and raw material"
-  ][index]
-}));
-
 export default function AboutPage() {
+  const media = getMediaMap(getDatabase());
+  const images = Array.from({ length: 6 }, (_, index) => ({
+    src: media[`about.gallery.${index + 1}`]?.imageUrl || `/images/bespoke-elemental/about-0${index + 1}.png`,
+    alt: media[`about.gallery.${index + 1}`]?.altText || `Bespoke Elemental workshop image ${index + 1}`
+  }));
+  const hero = media["about.hero"];
+
   return (
     <AnimatedShell>
       <main>
-        <section className="about-intro section">
+        <section className="about-intro section" style={{ backgroundImage: `linear-gradient(180deg, rgba(5, 5, 5, 0.15), rgba(5, 5, 5, 0.88)), url('${hero?.imageUrl || "/images/bespoke-elemental/about-01.png"}')` }}>
           <div className="container">
             <p className="eyebrow reveal">About Us</p>
             <h1 className="display reveal">Engineering the Elemental</h1>

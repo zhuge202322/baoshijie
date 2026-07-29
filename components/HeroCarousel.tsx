@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const slides = [
+const defaultSlides = [
   {
     image: "/images/bespoke-elemental/hero-01.png",
     alt: "Classic Porsche 911 in a dark studio with its body panels open",
@@ -21,7 +21,7 @@ const slides = [
   }
 ];
 
-export function HeroCarousel() {
+export function HeroCarousel({ slides = defaultSlides }: { slides?: Array<{ image: string; alt: string; copy?: string }> }) {
   const [active, setActive] = useState(0);
   const dragStart = useRef<number | null>(null);
 

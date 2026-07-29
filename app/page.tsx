@@ -6,22 +6,38 @@ import { Footer } from "@/components/Footer";
 import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductCard } from "@/components/ProductCard";
 import { AddToCartButton } from "@/components/AddToCartButton";
-import { featuredProduct, formatCurrency, products } from "@/data/products";
+import { formatUsd } from "@/lib/catalog/model";
+import { getMediaMap, listStorefrontProducts } from "@/lib/catalog/storefront";
+import { getDatabase } from "@/lib/db/client";
 
 export default function HomePage() {
+  const database = getDatabase();
+  const products = listStorefrontProducts(database);
+  const media = getMediaMap(database);
+  const featuredProduct = products[0];
   const preview = products.slice(0, 6);
+  const heroCopy = [
+    "Bespoke Elemental now specializes in premium restoration or tuning parts & OE aftermarket parts for classic Porsche models, including the 911 (G-model, 964, 993, 996, 997)",
+    "From advanced carbon fiber composites to durable metal and plastic components, our parts are engineered for those who demand uncompromising quality.",
+    "Born from the grueling demands of GT racing carbon fiber maintenance and development, our expertise is now available to elevate your driving experience."
+  ];
+  const heroSlides = [1, 2, 3].map((index) => ({
+    image: media[`home.hero.${index}`]?.imageUrl || `/images/bespoke-elemental/hero-0${index}.png`,
+    alt: media[`home.hero.${index}`]?.altText || `Classic Porsche showcase ${index}`,
+    copy: heroCopy[index - 1]
+  }));
 
   return (
     <AnimatedShell>
       <main>
         <section className="hero-section carousel-hero" aria-label="Classic Porsche showcase">
-          <HeroCarousel />
+          <HeroCarousel slides={heroSlides} />
           <a className="hero-scroll-cue" href="#featured-modification" aria-label="Scroll to next section">
             <ChevronDown size={30} aria-hidden="true" />
           </a>
         </section>
 
-        <section className="section" id="featured-modification">
+        {featuredProduct ? <section className="section" id="featured-modification">
           <div className="container grid-12">
             <div className="reveal" style={{ gridColumn: "span 5" }}>
               <p className="eyebrow" style={{ color: "#d5001c" }}>
@@ -36,7 +52,7 @@ export default function HomePage() {
                 machined hub meet in a serialized build.
               </p>
               <div style={{ marginTop: 28, display: "flex", flexWrap: "wrap", gap: 12 }}>
-                <AddToCartButton slug={featuredProduct.slug} label={`Pre-Order ${formatCurrency(featuredProduct.price)}`} />
+                <AddToCartButton slug={featuredProduct.slug} label={`Pre-Order ${formatUsd(featuredProduct.priceCents)}`} />
                 <Link className="button ghost mono" href={`/product/${featuredProduct.slug}`}>
                   Technical Specs
                 </Link>
@@ -61,15 +77,15 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> : null}
 
         <section className="section" style={{ background: "rgba(0,0,0,.22)" }}>
           <div className="container grid-12">
             <div className="reveal" style={{ gridColumn: "span 6" }}>
               <div className="panel" style={{ overflow: "hidden" }}>
                 <img
-                  src="/images/bespoke-elemental/heritage-hero-hd.webp"
-                  alt="Carbon fiber bodywork with white and red accents"
+                  src={media["home.heritage"]?.imageUrl || "/images/bespoke-elemental/heritage-hero-hd.webp"}
+                  alt={media["home.heritage"]?.altText || "Carbon fiber bodywork with white and red accents"}
                   style={{ width: "100%", height: "min(64vw, 640px)", objectFit: "cover" }}
                 />
               </div>
