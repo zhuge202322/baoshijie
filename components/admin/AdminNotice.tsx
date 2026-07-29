@@ -6,7 +6,13 @@ const savedMessages: Record<string, string> = {
   "product-updated": "Product updated.",
   "product-archived": "Product archived.",
   "product-restored": "Product restored.",
-  "product-deleted": "Product deleted."
+  "product-deleted": "Product deleted.",
+  "settings-updated": "Site settings updated.",
+  "social-created": "Social link created.",
+  "social-updated": "Social link updated.",
+  "social-deleted": "Social link deleted.",
+  "media-updated": "Page image updated.",
+  "media-restored": "Page image restored to its default."
 };
 
 export function AdminNotice({ error, saved }: { error?: string; saved?: string }) {

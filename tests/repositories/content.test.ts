@@ -3,6 +3,7 @@ import test from "node:test";
 import { createDatabase, migrateDatabase } from "../../lib/db/client.ts";
 import { seedDatabase } from "../../lib/db/seed.ts";
 import {
+  createMediaAsset,
   createSocialLink,
   deleteSocialLink,
   getSiteSettings,
@@ -76,6 +77,24 @@ test("media slots can be replaced and restored to seeded images", () => {
     restoreMediaSlot(database, "home.hero.1");
     slot = listMediaSlots(database, "home").find((item) => item.slotKey === "home.hero.1");
     assert.equal(slot?.imageUrl, "/images/bespoke-elemental/hero-01.png");
+  } finally {
+    database.close();
+  }
+});
+
+test("uploaded media metadata is recorded with a stable public URL", () => {
+  const database = setup();
+  try {
+    const asset = createMediaAsset(database, {
+      filename: "asset-id.webp",
+      originalName: "hero.webp",
+      mimeType: "image/webp",
+      sizeBytes: 2048,
+      publicUrl: "/media/asset-id.webp"
+    });
+    const row = database.prepare("SELECT * FROM media_assets WHERE id = ?").get(asset.id);
+    assert.equal(row?.public_url, "/media/asset-id.webp");
+    assert.equal(row?.size_bytes, 2048);
   } finally {
     database.close();
   }

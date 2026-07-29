@@ -3,6 +3,7 @@ import type { CommerceDatabase } from "../db/client.ts";
 import {
   optionalText,
   requireImageUrl,
+  requireNonNegativeInteger,
   requireSortOrder,
   requireText,
   requireWebUrl,
@@ -35,6 +36,14 @@ export type MediaSlot = {
   defaultImageUrl: string;
   altText: string;
   sortOrder: number;
+};
+
+export type MediaAssetInput = {
+  filename: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: number;
+  publicUrl: string;
 };
 
 export function getSiteSettings(database: CommerceDatabase): SiteSettings {
@@ -171,4 +180,23 @@ export function restoreMediaSlot(database: CommerceDatabase, slotKey: string) {
     .prepare("UPDATE media_slots SET image_url = default_image_url, updated_at = ? WHERE slot_key = ?")
     .run(Date.now(), slotKey);
   if (result.changes === 0) throw new Error("Media slot not found");
+}
+
+export function createMediaAsset(database: CommerceDatabase, input: MediaAssetInput) {
+  const value = {
+    filename: requireText(input.filename, "Filename", 255),
+    originalName: requireText(input.originalName, "Original filename", 255),
+    mimeType: requireText(input.mimeType, "Media type", 100),
+    sizeBytes: requireNonNegativeInteger(input.sizeBytes, "File size"),
+    publicUrl: requireImageUrl(input.publicUrl)
+  };
+  if (!["image/jpeg", "image/png", "image/webp", "image/avif"].includes(value.mimeType)) {
+    throw new Error("Unsupported media type");
+  }
+  const id = `media-${randomUUID()}`;
+  database.prepare(`
+    INSERT INTO media_assets (id, filename, original_name, mime_type, size_bytes, public_url, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `).run(id, value.filename, value.originalName, value.mimeType, value.sizeBytes, value.publicUrl, Date.now());
+  return { id, ...value };
 }
