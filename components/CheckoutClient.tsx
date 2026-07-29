@@ -92,7 +92,7 @@ export function CheckoutClient({ paymentConfig }: { paymentConfig: PaymentConfig
 
   return (
     <div className="container section checkout-page">
-      <header className="checkout-header"><p className="eyebrow">Guest checkout</p><h1 className="display">Secure Checkout</h1><p className="muted">{itemCount} items · USD</p></header>
+      <header className="checkout-header"><p className="eyebrow">Guest checkout</p><h1 className="display">Secure Checkout</h1><p className="muted">{itemCount} {itemCount === 1 ? "item" : "items"} · USD</p></header>
       <form className="checkout-layout" onSubmit={createOrder}>
         <div className="checkout-details" aria-disabled={Boolean(session)}>
           <CheckoutSection number="01" title="Contact and delivery">

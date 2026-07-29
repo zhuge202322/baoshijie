@@ -4,9 +4,9 @@
 
 **Goal:** Replace hard-coded storefront content with a SQLite-backed catalog/CMS and provide a secure single-administrator back office.
 
-**Architecture:** Drizzle ORM owns a WAL-enabled SQLite database on persistent disk. Server repositories expose catalog, settings, media, and order data; protected server actions power the admin pages, while public server components consume the same repositories.
+**Architecture:** Node's built-in SQLite API owns a WAL-enabled database on persistent disk. Server repositories expose catalog, settings, media, and order data; protected server actions power the admin pages, while public server components consume the same repositories.
 
-**Tech Stack:** Next.js App Router, TypeScript, Drizzle ORM, better-sqlite3, Zod, bcryptjs, jose, Vitest, local persistent uploads.
+**Tech Stack:** Next.js App Router, TypeScript, Node 24 `node:sqlite`, scrypt/HMAC from `node:crypto`, Node's native test runner, Playwright, and local persistent uploads.
 
 ---
 
@@ -20,7 +20,7 @@
 - Create: `tests/db/schema.test.ts`
 - Modify: `package.json`
 
-- [ ] Add Vitest and database dependencies and a `test` script.
+- [x] Add native database/test scripts without third-party database dependencies.
 - [ ] Write a failing test that creates a temporary database and expects all catalog, content, order, payment, and webhook tables to exist with foreign keys enabled.
 - [ ] Run `pnpm test tests/db/schema.test.ts` and confirm the missing schema failure.
 - [ ] Implement the schema in integer cents, create the client with `journal_mode = WAL` and `foreign_keys = ON`, and generate/apply migrations.
@@ -52,7 +52,7 @@
 
 - [ ] Write failing tests for category deletion guards, product archive semantics, cents-only prices, site setting updates, social ordering, and media-slot updates.
 - [ ] Run the tests and confirm repository functions are absent.
-- [ ] Implement repository functions with transactions and Zod parsing at mutation boundaries.
+- [x] Implement repository functions with transactions and typed validation at mutation boundaries.
 - [ ] Run focused repository tests and confirm they pass.
 
 ### Task 4: Add single-admin authentication
@@ -67,7 +67,7 @@
 
 - [ ] Write failing tests for password-hash verification, signed session expiry, tampered cookies, and login throttling.
 - [ ] Run the tests and verify the expected failures.
-- [ ] Implement bcrypt password verification, jose-signed HttpOnly cookies, timing-safe username comparison, and per-IP login throttling.
+- [x] Implement scrypt password verification, HMAC-signed HttpOnly cookies, timing-safe username comparison, and per-IP login throttling.
 - [ ] Add login/logout UI and verify tests pass.
 
 ### Task 5: Build the protected admin shell
@@ -147,4 +147,3 @@
 - [ ] Document `DATABASE_PATH`, `UPLOAD_DIR`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH`, and `SESSION_SECRET`.
 - [ ] Ignore runtime database/uploads, enable standalone output, and document persistent mounts, backup, migration, seed, build, and start commands.
 - [ ] Run `pnpm test`, `pnpm typecheck`, `pnpm build`, and a fresh temporary `db:init` smoke test.
-

@@ -109,7 +109,7 @@ export function SiteNav({
             )}
           </div>
 
-          <Link className="icon-button" href="/cart" aria-label={`Cart with ${count} items`} title="Cart">
+          <Link className="icon-button" href="/cart" aria-label={`Cart with ${count} ${count === 1 ? "item" : "items"}`} title="Cart">
             <span style={{ position: "relative", display: "inline-flex" }}>
               <ShoppingCart size={22} aria-hidden="true" />
               {count > 0 && (

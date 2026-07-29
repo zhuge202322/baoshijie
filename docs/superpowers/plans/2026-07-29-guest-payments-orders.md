@@ -6,7 +6,7 @@
 
 **Architecture:** A provider-neutral checkout service creates immutable pending orders after server-side repricing. Airwallex and PayPal adapters create/capture provider resources; verified idempotent webhooks are the authoritative payment-state source.
 
-**Tech Stack:** Next.js route handlers, Drizzle/SQLite transactions, Zod, Airwallex hosted web components, PayPal JavaScript SDK and Orders v2 REST API, Vitest, Playwright.
+**Tech Stack:** Next.js route handlers, Node 24 SQLite transactions, typed validation, Airwallex hosted web components, PayPal JavaScript SDK and Orders v2 REST API, Node's native test runner, and Playwright.
 
 ---
 

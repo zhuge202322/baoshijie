@@ -8,18 +8,18 @@ import {
   verifySessionToken
 } from "@/lib/auth/session";
 import { adminLoginRateLimiter } from "@/lib/auth/rate-limit";
+import { getPublicRequestOrigin, hasValidRequestOrigin } from "@/lib/auth/request-origin";
 
 export const runtime = "nodejs";
 
 function loginRedirect(request: Request, error?: string) {
-  const url = new URL("/admin/login", request.url);
+  const url = new URL("/admin/login", getPublicRequestOrigin(request));
   if (error) url.searchParams.set("error", error);
   return NextResponse.redirect(url, 303);
 }
 
 export async function POST(request: Request) {
-  const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) {
+  if (!hasValidRequestOrigin(request)) {
     return new NextResponse("Invalid request origin", { status: 403 });
   }
 
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   const token = createSessionToken(username, sessionSecret);
   const session = verifySessionToken(token, sessionSecret);
   if (!session) return loginRedirect(request, "invalid");
-  const response = NextResponse.redirect(new URL("/admin", request.url), 303);
+  const response = NextResponse.redirect(new URL("/admin", getPublicRequestOrigin(request)), 303);
   response.cookies.set(ADMIN_SESSION_COOKIE, token, getSessionCookieOptions(session.expiresAt));
   return response;
 }

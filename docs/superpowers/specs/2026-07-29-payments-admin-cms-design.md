@@ -18,7 +18,7 @@ Build a single-server commerce backend for the existing Next.js storefront. The 
 
 ## Architecture
 
-The application runs as one Node.js Next.js instance on an independent server with a persistent disk. SQLite is accessed through Drizzle ORM and `better-sqlite3`; WAL mode and foreign keys are enabled at startup. Database and uploads live outside build artifacts under configurable persistent paths.
+The application runs as one Node.js 24+ Next.js instance on an independent server with a persistent disk. SQLite is accessed through the built-in `node:sqlite` API; WAL mode and foreign keys are enabled at startup. Database and uploads live outside build artifacts under configurable persistent paths.
 
 All prices are recalculated on the server from active database products. Client totals are display-only. Provider-specific code sits behind payment adapters so Airwallex and PayPal cannot leak provider details into order calculations or the CMS.
 
@@ -50,7 +50,7 @@ Order states are `PENDING_PAYMENT`, `PAYMENT_PROCESSING`, `PAID`, `PAYMENT_FAILE
 
 The login form posts credentials to a Node runtime route. The username is compared with a timing-safe comparison and the password is verified against `ADMIN_PASSWORD_HASH`. A signed, HttpOnly, Secure, SameSite=Lax session cookie contains issuance and expiry times. All `/admin` pages and `/api/admin/*` routes verify the cookie independently.
 
-Mutation routes validate data with Zod and enforce same-origin requests. Login attempts receive a lightweight in-memory/IP rate limit suitable for one process. Uploaded files accept JPEG, PNG, WebP, or AVIF only, enforce a 10 MB limit, use generated names, and reject path traversal. Card and PayPal credentials never pass through or persist in this application.
+Mutation routes use typed validation helpers and enforce same-origin requests. Login and checkout attempts receive a lightweight in-memory/IP rate limit suitable for one process. Uploaded files accept signature-verified JPEG, PNG, WebP, or AVIF only, enforce a 10 MB limit, use generated names, and reject path traversal. Card data and provider secrets never pass through or persist in this application.
 
 ## CMS Experience
 

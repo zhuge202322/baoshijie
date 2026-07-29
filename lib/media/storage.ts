@@ -37,7 +37,7 @@ export type SavedImage = {
 };
 
 export function getUploadDirectory() {
-  return resolve(process.env.UPLOAD_DIR || resolve(process.cwd(), "storage", "uploads"));
+  return resolve(/* turbopackIgnore: true */ process.env.UPLOAD_DIR || resolve(process.cwd(), "storage", "uploads"));
 }
 
 export async function saveImageUpload(
@@ -52,7 +52,7 @@ export async function saveImageUpload(
   const bytes = new Uint8Array(await file.arrayBuffer());
   if (!definition.matches(bytes)) throw new Error("Image file signature does not match its declared type");
 
-  const uploadDir = resolve(options.uploadDir || getUploadDirectory());
+  const uploadDir = resolve(/* turbopackIgnore: true */ options.uploadDir || getUploadDirectory());
   const filename = `${(options.randomId || randomUUID)()}.${definition.extension}`;
   const target = resolveMediaPath(uploadDir, [filename]);
   await mkdir(uploadDir, { recursive: true });
@@ -71,7 +71,7 @@ export function resolveMediaPath(uploadDir: string, pathParts: string[]) {
   if (pathParts.length !== 1 || !/^[a-zA-Z0-9_-]{8,80}\.(?:jpg|png|webp|avif)$/.test(pathParts[0] || "")) {
     throw new Error("Invalid media path");
   }
-  const root = resolve(uploadDir);
+  const root = resolve(/* turbopackIgnore: true */ uploadDir);
   const target = resolve(root, pathParts[0]);
   if (!target.startsWith(`${root}\\`) && !target.startsWith(`${root}/`)) throw new Error("Invalid media path");
   return target;
