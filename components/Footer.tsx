@@ -6,7 +6,6 @@ export function Footer() {
   const { settings, socialLinks } = getStorefrontContent(getDatabase());
   const connect = [
     ...socialLinks.map((link) => ({ label: link.label, href: link.url })),
-    ...(settings.supportEmail ? [{ label: settings.supportEmail, href: `mailto:${settings.supportEmail}` }] : []),
     ...(settings.supportPhone ? [{ label: settings.supportPhone, href: `tel:${settings.supportPhone.replace(/[^+\d]/g, "")}` }] : []),
     ...(settings.supportWhatsapp ? [{ label: "WhatsApp", href: `https://wa.me/${settings.supportWhatsapp.replace(/\D/g, "")}` }] : []),
     { label: "Contact Us", href: "/#contact-us" }

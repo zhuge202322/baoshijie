@@ -9,6 +9,7 @@ const categories = [
 ] as const;
 
 const categoryIds = new Map(categories.map(([id, name]) => [name, id]));
+const defaultSupportEmail = "info@bespoke-elemental.com";
 
 const mediaSlots = [
   ["home.hero.1", "home", "Hero slide 1", "/images/bespoke-elemental/hero-01.png", "Classic Porsche 911 in a dark studio with its body panels open", 10],
@@ -79,10 +80,10 @@ export function seedDatabase(database: CommerceDatabase) {
         INSERT INTO site_settings (
           id, website_name, logo_url, support_email, support_phone,
           support_whatsapp, company_address, updated_at
-        ) VALUES (1, ?, ?, '', '', '', '', ?)
+        ) VALUES (1, ?, ?, ?, '', '', '', ?)
         ON CONFLICT(id) DO NOTHING
       `)
-      .run("Bespoke Elemental", "/brand/flame-logo.png", now);
+      .run("Bespoke Elemental", "/brand/flame-logo.png", defaultSupportEmail, now);
 
     const insertSocial = database.prepare(`
       INSERT INTO social_links (id, platform, label, url, sort_order, created_at, updated_at)

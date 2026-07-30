@@ -17,9 +17,10 @@ test("seed is idempotent and reproduces the current storefront", () => {
     assert.equal(database.prepare("SELECT COUNT(*) count FROM social_links").get()?.count, 2);
     assert.equal(database.prepare("SELECT COUNT(*) count FROM media_slots").get()?.count, 14);
 
-    const site = database.prepare("SELECT website_name, logo_url FROM site_settings WHERE id = 1").get();
+    const site = database.prepare("SELECT website_name, logo_url, support_email FROM site_settings WHERE id = 1").get();
     assert.equal(site?.website_name, "Bespoke Elemental");
     assert.equal(site?.logo_url, "/brand/flame-logo.png");
+    assert.equal(site?.support_email, "info@bespoke-elemental.com");
   } finally {
     database.close();
   }

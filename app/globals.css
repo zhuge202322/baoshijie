@@ -1378,6 +1378,15 @@ img {
   font-weight: 700;
 }
 
+.home-contact-actions {
+  max-width: 680px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
 .about-intro {
   min-height: 56dvh;
   display: flex;

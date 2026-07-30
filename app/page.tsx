@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ChevronDown, Gauge, ShieldCheck, Sparkles, Wrench } from "lucide-react";
+import { ArrowRight, ChevronDown, Gauge, Mail, ShieldCheck, Sparkles, Wrench } from "lucide-react";
 import { AnimatedShell } from "@/components/AnimatedShell";
 import { BuildConfigurator } from "@/components/BuildConfigurator";
 import { Footer } from "@/components/Footer";
@@ -7,13 +7,14 @@ import { HeroCarousel } from "@/components/HeroCarousel";
 import { ProductCard } from "@/components/ProductCard";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { formatUsd } from "@/lib/catalog/model";
-import { getMediaMap, listStorefrontProducts } from "@/lib/catalog/storefront";
+import { getMediaMap, getStorefrontContent, listStorefrontProducts } from "@/lib/catalog/storefront";
 import { getDatabase } from "@/lib/db/client";
 
 export default function HomePage() {
   const database = getDatabase();
   const products = listStorefrontProducts(database);
   const media = getMediaMap(database);
+  const { settings } = getStorefrontContent(database);
   const featuredProduct = products[0];
   const preview = products.slice(0, 6);
   const heroCopy = [
@@ -156,9 +157,21 @@ export default function HomePage() {
               Our workshop is accepting full interior conversions, limited component runs, and
               special material commissions for air-cooled platforms.
             </p>
-            <Link className="button primary mono" href="/checkout">
-              Start Acquisition
-            </Link>
+            <div className="home-contact-actions">
+              <Link className="button primary mono" href="/checkout">
+                Start Acquisition
+              </Link>
+              {settings.supportEmail ? (
+                <a
+                  className="button ghost mono"
+                  href={`mailto:${settings.supportEmail}`}
+                  aria-label={`Email ${settings.supportEmail}`}
+                >
+                  <Mail size={17} aria-hidden="true" />
+                  {settings.supportEmail}
+                </a>
+              ) : null}
+            </div>
           </div>
         </section>
       </main>
