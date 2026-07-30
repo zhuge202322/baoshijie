@@ -1,4 +1,5 @@
 import { mkdirSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { seedDatabase } from "./seed.ts";
@@ -192,7 +193,8 @@ const globalDatabase = globalThis as typeof globalThis & {
 
 export function getDatabase() {
   if (!globalDatabase.__commerceDatabase) {
-    const filename = process.env.DATABASE_PATH || resolve(process.cwd(), "storage", "baoshijie.sqlite");
+    const defaultDirectory = process.env.VERCEL ? tmpdir() : resolve(process.cwd(), "storage");
+    const filename = process.env.DATABASE_PATH || resolve(defaultDirectory, "baoshijie.sqlite");
     const database = createDatabase(filename);
     migrateDatabase(database);
     seedDatabase(database);
