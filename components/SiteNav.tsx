@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Globe2, Menu, ShoppingCart, X } from "lucide-react";
+import { Globe2, Menu, ShoppingCart, X } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/components/CartProvider";
 
@@ -10,7 +10,7 @@ const links = [
   { href: "/about", label: "About Us" },
   { href: "/heritage", label: "Heritage" },
   { href: "/#latest-release", label: "Latest Release" },
-  { href: "/catalog", label: "Shop" },
+  { href: "/catalog", label: "Products" },
   { href: "/#contact-us", label: "Contact Us" }
 ];
 
@@ -25,7 +25,6 @@ export function SiteNav({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [productOpen, setProductOpen] = useState(false);
   const [socialOpen, setSocialOpen] = useState(false);
   const { count } = useCart();
 
@@ -44,45 +43,15 @@ export function SiteNav({
         </Link>
 
         <div className="nav-links">
-          {links.slice(0, 3).map((link) => (
+          {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              aria-current={pathname === link.href ? "page" : undefined}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <div
-            className="nav-dropdown"
-            data-open={productOpen}
-            onMouseEnter={() => setProductOpen(true)}
-            onMouseLeave={() => setProductOpen(false)}
-          >
-            <button
-              type="button"
-              aria-expanded={productOpen}
-              aria-haspopup="menu"
-              onFocus={() => setProductOpen(true)}
-              onClick={() => setProductOpen((value) => !value)}
-            >
-              Product
-              <ChevronDown size={14} aria-hidden="true" />
-            </button>
-            <div className="nav-dropdown-menu" role="menu">
-              <Link href="/catalog?type=bespoke" role="menuitem" onClick={() => setProductOpen(false)}>
-                Bespoke products
-              </Link>
-              <Link href="/catalog?type=oe" role="menuitem" onClick={() => setProductOpen(false)}>
-                OE aftermarket products
-              </Link>
-            </div>
-          </div>
-          {links.slice(3).map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-current={pathname === link.href ? "page" : undefined}
+              aria-current={
+                link.href === "/catalog"
+                  ? pathname === "/catalog" || pathname.startsWith("/product/") ? "page" : undefined
+                  : pathname === link.href ? "page" : undefined
+              }
             >
               {link.label}
             </Link>
@@ -134,19 +103,7 @@ export function SiteNav({
 
       {open && (
         <div className="nav-panel">
-          {links.slice(0, 3).map((link) => (
-            <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>
-              {link.label}
-            </Link>
-          ))}
-          <span className="nav-panel-label">Product</span>
-          <Link href="/catalog?type=bespoke" onClick={() => setOpen(false)}>
-            Bespoke products
-          </Link>
-          <Link href="/catalog?type=oe" onClick={() => setOpen(false)}>
-            OE aftermarket products
-          </Link>
-          {links.slice(3).map((link) => (
+          {links.map((link) => (
             <Link key={link.href} href={link.href} onClick={() => setOpen(false)}>
               {link.label}
             </Link>

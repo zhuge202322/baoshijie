@@ -1,13 +1,26 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Ruler, ShieldCheck, Truck } from "lucide-react";
-import { AddToCartButton } from "@/components/AddToCartButton";
+import {
+  ChevronRight,
+  Headphones,
+  LockKeyhole,
+  PackageCheck,
+  ShieldCheck,
+  Truck
+} from "lucide-react";
 import { AnimatedShell } from "@/components/AnimatedShell";
 import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductPurchasePanel } from "@/components/ProductPurchasePanel";
 import { formatUsd } from "@/lib/catalog/model";
 import { getStorefrontProduct, listStorefrontProducts } from "@/lib/catalog/storefront";
 import { getDatabase } from "@/lib/db/client";
+
+const inventoryCopy = {
+  in_stock: { label: "In stock", detail: "Usually ships in 1-3 business days" },
+  made_to_order: { label: "Made to order", detail: "Usually ships in 3-4 weeks" },
+  unavailable: { label: "Unavailable", detail: "Contact us for the next production window" }
+} as const;
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -15,58 +28,105 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = getStorefrontProduct(database, slug);
   if (!product) notFound();
 
-  const products = listStorefrontProducts(database);
-  const related = products.filter((item) => item.slug !== product.slug).slice(0, 3);
+  const products = listStorefrontProducts(database).filter((item) => item.slug !== product.slug);
+  const related = [
+    ...products.filter((item) => item.category === product.category),
+    ...products.filter((item) => item.category !== product.category)
+  ].slice(0, 3);
+  const inventory = inventoryCopy[product.inventoryStatus];
 
   return (
     <AnimatedShell>
       <main>
-        <section
-          className="hero-section"
-          style={{
-            minHeight: "calc(100dvh - 80px)",
-            background:
-              "linear-gradient(90deg, rgba(5,5,5,.9) 0%, rgba(5,5,5,.58) 45%, rgba(5,5,5,.9) 100%)"
-          }}
-        >
-          <div style={{ position: "absolute", inset: 0, zIndex: -1 }}>
-            <img
-              src={product.image}
-              alt=""
-              style={{ width: "100%", height: "100%", objectFit: "cover", opacity: 0.5, filter: "saturate(.85)" }}
-            />
-          </div>
-          <div className="carbon-weave" />
-          <div className="hero-copy">
-            <Link className="button ghost mono" href="/catalog" style={{ marginBottom: 24 }}>
-              <ArrowLeft size={17} aria-hidden="true" />
-              Back to Catalog
-            </Link>
-            {product.badge && (
-              <p className="eyebrow" style={{ width: "fit-content", padding: "7px 10px", background: "#d5001c", color: "#fff" }}>
-                {product.badge}
-              </p>
-            )}
-            <h1 className="display">{product.name}</h1>
-            <p>{product.description}</p>
-            <div className="hero-actions">
-              <AddToCartButton slug={product.slug} label={`Add ${formatUsd(product.priceCents)}`} />
-              <Link className="button ghost mono" href="/checkout">
-                Reserve Build Slot
-              </Link>
+        <section className="product-detail-section">
+          <div className="container">
+            <nav className="product-breadcrumb mono" aria-label="Breadcrumb">
+              <Link href="/">Home</Link>
+              <ChevronRight size={14} aria-hidden="true" />
+              <Link href="/catalog">Products</Link>
+              <ChevronRight size={14} aria-hidden="true" />
+              <span aria-current="page">{product.name}</span>
+            </nav>
+
+            <div className="product-detail-layout">
+              <div className="product-gallery reveal">
+                <figure className="product-main-media">
+                  {product.badge ? <figcaption>{product.badge}</figcaption> : null}
+                  <img src={product.image} alt={product.name} />
+                </figure>
+                <div className="product-media-meta mono">
+                  <span>{product.partNo}</span>
+                  <span>{product.material}</span>
+                </div>
+              </div>
+
+              <div className="product-buy-box reveal">
+                <div className="product-type-row mono">
+                  <span>{product.productType}</span>
+                  <span>{product.category}</span>
+                </div>
+                <h1 className="headline">{product.name}</h1>
+                <p className="product-part-number mono">Part no. {product.partNo}</p>
+                <p className="product-detail-price">{formatUsd(product.priceCents)}</p>
+                <p className="product-short-description">{product.short}</p>
+
+                <div className={`product-inventory product-inventory-${product.inventoryStatus}`}>
+                  <span aria-hidden="true" />
+                  <div>
+                    <strong>{inventory.label}</strong>
+                    <small>{inventory.detail}</small>
+                  </div>
+                </div>
+
+                <div className="product-fitment-summary">
+                  <p className="product-control-label">Compatible with</p>
+                  <div>
+                    {product.compatibility.map((model) => <span key={model}>{model}</span>)}
+                  </div>
+                </div>
+
+                <ProductPurchasePanel
+                  slug={product.slug}
+                  name={product.name}
+                  inventoryStatus={product.inventoryStatus}
+                />
+
+                <div className="product-buy-assurance">
+                  <span><Truck size={18} aria-hidden="true" />Tracked international delivery</span>
+                  <span><LockKeyhole size={18} aria-hidden="true" />Secure hosted payment</span>
+                </div>
+                <p className="product-fitment-help">
+                  Unsure about fitment? <Link href="/#contact-us">Contact us before ordering.</Link>
+                </p>
+              </div>
             </div>
-            <p className="mono muted" style={{ marginTop: 28, fontSize: 13 }}>
-              Est. delivery: 4-6 weeks / SKU: {product.partNo}
-            </p>
           </div>
         </section>
 
-        <section className="section">
-          <div className="container grid-12">
-            <div className="panel panel-pad reveal" style={{ gridColumn: "span 5" }}>
-              <h2 className="headline" style={{ marginTop: 0 }}>
-                Technical Specs
-              </h2>
+        <section className="product-information-band">
+          <div className="container product-information-grid">
+            <article className="product-description-block reveal">
+              <p className="eyebrow">Product information</p>
+              <h2 className="headline">Details and fitment</h2>
+              <p>{product.description}</p>
+              <dl className="product-facts">
+                <div><dt>Material</dt><dd>{product.material}</dd></div>
+                <div><dt>Category</dt><dd>{product.category}</dd></div>
+                <div><dt>Product type</dt><dd>{product.productType}</dd></div>
+              </dl>
+              <div className="product-compatibility-list">
+                <h3 className="headline">Vehicle compatibility</h3>
+                <ul>
+                  {product.compatibility.map((model) => (
+                    <li key={model}><PackageCheck size={18} aria-hidden="true" />{model}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+
+            <section className="product-specifications reveal" aria-labelledby="product-specifications-heading">
+              <p className="eyebrow">Build data</p>
+              <h2 className="headline" id="product-specifications-heading">Technical specifications</h2>
               <table className="spec-table">
                 <tbody>
                   {Object.entries(product.specs).map(([label, value]) => (
@@ -75,33 +135,31 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                       <td>{value}</td>
                     </tr>
                   ))}
-                  <tr>
-                    <td>Compatibility</td>
-                    <td>{product.compatibility.join(", ")}</td>
-                  </tr>
                 </tbody>
               </table>
-            </div>
-
-            <div className="reveal" style={{ gridColumn: "span 7" }}>
-              <div style={{ display: "grid", gap: 18 }}>
-                <Feature icon={<Ruler size={20} aria-hidden="true" />} title="Measured fitment" text="Designed around factory mounting points and scanned chassis tolerances." />
-                <Feature icon={<ShieldCheck size={20} aria-hidden="true" />} title="Serialized inspection" text="Each component is inspected and logged before shipment." />
-                <Feature icon={<Truck size={20} aria-hidden="true" />} title="Insured delivery" text="High-value parts ship in reinforced packaging with tracked delivery." />
-              </div>
-            </div>
+            </section>
           </div>
         </section>
 
-        <section className="section" style={{ background: "rgba(0,0,0,.22)" }}>
+        <section className="product-service-band" aria-label="Purchase support">
+          <div className="container product-service-grid">
+            <Service icon={<ShieldCheck size={22} aria-hidden="true" />} title="Fitment checked" text="Order details are reviewed against your exact Porsche model." />
+            <Service icon={<Truck size={22} aria-hidden="true" />} title="Tracked shipping" text="DHL, FedEx, UPS, and alternative freight options are available." />
+            <Service icon={<Headphones size={22} aria-hidden="true" />} title="Direct support" text="Our team contacts you directly when an order needs confirmation." />
+          </div>
+        </section>
+
+        <section className="section product-recommendations">
           <div className="container">
-            <h2 className="display reveal" style={{ margin: "0 0 32px", fontSize: "clamp(2.4rem, 6vw, 5rem)" }}>
-              Recommended Components
-            </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24 }}>
-              {related.map((item) => (
-                <ProductCard key={item.slug} product={item} />
-              ))}
+            <div className="product-section-heading reveal">
+              <div>
+                <p className="eyebrow">Selected for your build</p>
+                <h2 className="headline">You may also like</h2>
+              </div>
+              <Link className="mono" href="/catalog">View all products <ChevronRight size={15} aria-hidden="true" /></Link>
+            </div>
+            <div className="catalog-grid">
+              {related.map((item) => <ProductCard key={item.slug} product={item} />)}
             </div>
           </div>
         </section>
@@ -111,22 +169,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   );
 }
 
-function Feature({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+function Service({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
   return (
-    <div className="panel panel-pad">
-      <div style={{ display: "grid", gridTemplateColumns: "44px 1fr", gap: 16, alignItems: "start" }}>
-        <span className="icon-button" style={{ color: "#ffb3ac", borderColor: "rgba(255,179,172,.28)" }}>
-          {icon}
-        </span>
-        <div>
-          <h3 className="headline" style={{ margin: "0 0 8px", fontSize: "1.15rem" }}>
-            {title}
-          </h3>
-          <p className="muted" style={{ margin: 0, lineHeight: 1.62 }}>
-            {text}
-          </p>
-        </div>
-      </div>
+    <div className="product-service-item">
+      <span>{icon}</span>
+      <div><strong>{title}</strong><p>{text}</p></div>
     </div>
   );
 }

@@ -41,7 +41,7 @@ export function CatalogClient({
       <aside className="panel panel-pad reveal catalog-sidebar" style={{ gridColumn: "span 3", alignSelf: "start" }}>
         <div className="catalog-filter-title">
           <SlidersHorizontal size={18} color="#ffb3ac" aria-hidden="true" />
-          <h1 className="headline">Precision Filters</h1>
+          <h2 className="headline">Filters</h2>
         </div>
 
         <div className="catalog-vehicle">
@@ -73,7 +73,10 @@ export function CatalogClient({
 
       <div style={{ gridColumn: "span 9" }}>
         <div className="catalog-summary reveal">
-          <p className="eyebrow">{initialType ? `${initialType} products` : category ?? "Premium Inventory"}</p>
+          <div>
+            <p className="eyebrow">{initialType ? `${initialType} products` : category ?? "Parts catalog"}</p>
+            <h1 className="headline">Products</h1>
+          </div>
           <p className="mono muted">{filtered.length} items available</p>
         </div>
 

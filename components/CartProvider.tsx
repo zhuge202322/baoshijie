@@ -14,7 +14,7 @@ type CartContextValue = {
   hydrated: boolean;
   count: number;
   subtotalCents: number;
-  addItem: (slug: string) => void;
+  addItem: (slug: string, quantity?: number) => void;
   removeItem: (slug: string) => void;
   setQuantity: (slug: string, quantity: number) => void;
   clear: () => void;
@@ -71,15 +71,16 @@ export function CartProvider({ children, products }: { children: React.ReactNode
       hydrated,
       count,
       subtotalCents,
-      addItem: (slug) => {
+      addItem: (slug, quantity = 1) => {
+        const amount = Math.max(1, Math.min(9, Math.trunc(quantity)));
         setLines((current) => {
           const existing = current.find((line) => line.slug === slug);
           if (existing) {
             return current.map((line) =>
-              line.slug === slug ? { ...line, quantity: Math.min(9, line.quantity + 1) } : line
+              line.slug === slug ? { ...line, quantity: Math.min(9, line.quantity + amount) } : line
             );
           }
-          return [...current, { slug, quantity: 1 }];
+          return [...current, { slug, quantity: amount }];
         });
       },
       removeItem: (slug) => {
