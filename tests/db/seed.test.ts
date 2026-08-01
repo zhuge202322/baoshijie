@@ -15,6 +15,7 @@ test("seed is idempotent and reproduces the current storefront", () => {
     assert.equal(database.prepare("SELECT COUNT(*) count FROM categories").get()?.count, 4);
     assert.equal(database.prepare("SELECT COUNT(*) count FROM site_settings").get()?.count, 1);
     assert.equal(database.prepare("SELECT COUNT(*) count FROM social_links").get()?.count, 2);
+    assert.equal(database.prepare("SELECT COUNT(*) count FROM shipping_rates").get()?.count, 2);
     assert.equal(database.prepare("SELECT COUNT(*) count FROM media_slots").get()?.count, 14);
 
     const site = database.prepare("SELECT website_name, logo_url, support_email FROM site_settings WHERE id = 1").get();

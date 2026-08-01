@@ -39,7 +39,7 @@ The process user must have read/write access to both directories. SQLite enables
 
 ## Payments
 
-The store charges USD only, adds no tax, and offers fixed standard `$12.00` or expedited `$45.00` shipping. Provider secrets remain server-side. Card fields are rendered only by the hosted Airwallex component.
+The store charges USD only, adds no tax, and seeds standard shipping at `$12.00` and expedited shipping at `$45.00`. Both shipping rates can be changed in Site settings in the administrator panel. Provider secrets remain server-side. Card fields are rendered only by the hosted Airwallex component.
 
 PayPal webhook URL:
 

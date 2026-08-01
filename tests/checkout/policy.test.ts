@@ -35,6 +35,15 @@ test("checkout totals use integer cents and contain no tax", () => {
   assert.throws(() => calculateCheckoutTotals([-1], "standard"), /integer cents/);
 });
 
+test("checkout totals accept configured shipping rates", () => {
+  assert.deepEqual(calculateCheckoutTotals([10000], "standard", { standard: 1899, expedited: 5275 }), {
+    currency: "USD",
+    subtotalCents: 10000,
+    shippingCents: 1899,
+    totalCents: 11899
+  });
+});
+
 test("cart lines require a product slug and quantities from one through nine", () => {
   assert.deepEqual(validateCartLines([{ slug: "heritage-wheel", quantity: 2 }]), [{ slug: "heritage-wheel", quantity: 2 }]);
   assert.throws(() => validateCartLines([]), /empty/);

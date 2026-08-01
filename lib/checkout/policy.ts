@@ -1,6 +1,7 @@
 import { checkoutCountries, type CheckoutCountryCode } from "./countries.ts";
+import { defaultShippingRates, type ShippingMethod, type ShippingRates } from "./shipping.ts";
 
-export type ShippingMethod = "standard" | "expedited";
+export type { ShippingMethod } from "./shipping.ts";
 export type CheckoutLine = { slug: string; quantity: number };
 
 const supportedCountryCodes = new Set<string>(checkoutCountries.map((country) => country.code));
@@ -9,19 +10,26 @@ export function isSupportedDestination(value: string): value is CheckoutCountryC
   return supportedCountryCodes.has(value);
 }
 
-export function getShippingCents(method: string) {
-  if (method === "standard") return 1200;
-  if (method === "expedited") return 4500;
-  throw new Error("Invalid shipping method");
+export function getShippingCents(method: string, rates: ShippingRates = defaultShippingRates) {
+  if (method !== "standard" && method !== "expedited") throw new Error("Invalid shipping method");
+  const shippingCents = rates[method as ShippingMethod];
+  if (!Number.isSafeInteger(shippingCents) || shippingCents < 0) {
+    throw new Error("Shipping price must use non-negative integer cents");
+  }
+  return shippingCents;
 }
 
-export function calculateCheckoutTotals(lineTotalsCents: number[], shippingMethod: string) {
+export function calculateCheckoutTotals(
+  lineTotalsCents: number[],
+  shippingMethod: string,
+  shippingRates: ShippingRates = defaultShippingRates
+) {
   if (lineTotalsCents.some((value) => !Number.isSafeInteger(value) || value < 0)) {
     throw new Error("Checkout prices must use non-negative integer cents");
   }
   const subtotalCents = lineTotalsCents.reduce((sum, value) => sum + value, 0);
   if (!Number.isSafeInteger(subtotalCents)) throw new Error("Checkout total is too large");
-  const shippingCents = getShippingCents(shippingMethod);
+  const shippingCents = getShippingCents(shippingMethod, shippingRates);
   return {
     currency: "USD" as const,
     subtotalCents,

@@ -61,6 +61,12 @@ CREATE TABLE IF NOT EXISTS social_links (
   updated_at INTEGER NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS shipping_rates (
+  method TEXT PRIMARY KEY CHECK (method IN ('standard', 'expedited')),
+  price_cents INTEGER NOT NULL CHECK (price_cents >= 0),
+  updated_at INTEGER NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS media_assets (
   id TEXT PRIMARY KEY,
   filename TEXT NOT NULL UNIQUE,

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { parseMediaSlotForm, parseSiteSettingsForm, parseSocialLinkForm } from "@/lib/admin/content-input";
+import { parseMediaSlotForm, parseShippingRatesForm, parseSiteSettingsForm, parseSocialLinkForm } from "@/lib/admin/content-input";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import {
   createMediaAsset,
@@ -15,6 +15,7 @@ import {
 } from "@/lib/content/repository";
 import { getDatabase } from "@/lib/db/client";
 import { saveImageUpload } from "@/lib/media/storage";
+import { updateShippingRates } from "@/lib/checkout/shipping";
 
 function message(error: unknown) {
   if (error instanceof Error) {
@@ -33,6 +34,7 @@ function refreshContent() {
   revalidatePath("/admin/settings");
   revalidatePath("/admin/social");
   revalidatePath("/admin/media");
+  revalidatePath("/checkout");
   revalidatePath("/", "layout");
 }
 
@@ -48,8 +50,10 @@ export async function updateSiteSettingsAction(formData: FormData) {
   await requireAdmin();
   try {
     const input = parseSiteSettingsForm(formData);
+    const shippingRates = parseShippingRatesForm(formData);
     const uploadedLogo = await storeOptionalImage(formData, "logoFile");
     updateSiteSettings(getDatabase(), { ...input, logoUrl: uploadedLogo || input.logoUrl });
+    updateShippingRates(getDatabase(), shippingRates);
   } catch (error) {
     fail("/admin/settings", error);
   }

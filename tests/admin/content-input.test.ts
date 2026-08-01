@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseMediaSlotForm, parseSiteSettingsForm, parseSocialLinkForm } from "../../lib/admin/content-input.ts";
+import { parseMediaSlotForm, parseShippingRatesForm, parseSiteSettingsForm, parseSocialLinkForm } from "../../lib/admin/content-input.ts";
 
 function form(values: Record<string, string>) {
   const data = new FormData();
@@ -44,4 +44,15 @@ test("social and media forms parse ordering, activation, and alt text", () => {
     imageUrl: "/images/hero.jpg",
     altText: "Classic Porsche 911"
   });
+});
+
+test("shipping settings parse dollar amounts into integer cents", () => {
+  assert.deepEqual(parseShippingRatesForm(form({
+    standardShipping: "18.99",
+    expeditedShipping: "52.75"
+  })), { standard: 1899, expedited: 5275 });
+  assert.throws(() => parseShippingRatesForm(form({
+    standardShipping: "18.999",
+    expeditedShipping: "52.75"
+  })), /up to two decimal places/);
 });

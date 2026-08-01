@@ -10,13 +10,13 @@ import { PayPalCheckout } from "@/components/checkout/PayPalCheckout";
 import type { CheckoutSession, PaymentConfig } from "@/components/checkout/types";
 import { checkoutCountries } from "@/lib/checkout/countries";
 import { formatUsd } from "@/lib/catalog/model";
+import type { ShippingRates } from "@/lib/checkout/shipping";
 
-const shippingOptions = [
-  { id: "standard" as const, label: "Standard Shipping", detail: "5-7 business days", priceCents: 1200 },
-  { id: "expedited" as const, label: "Premium Expedited Air", detail: "2-4 business days", priceCents: 4500 }
-];
-
-export function CheckoutClient({ paymentConfig }: { paymentConfig: PaymentConfig }) {
+export function CheckoutClient({ paymentConfig, shippingRates }: { paymentConfig: PaymentConfig; shippingRates: ShippingRates }) {
+  const shippingOptions = [
+    { id: "standard" as const, label: "Standard Shipping", detail: "5-7 business days", priceCents: shippingRates.standard },
+    { id: "expedited" as const, label: "Premium Expedited Air", detail: "2-4 business days", priceCents: shippingRates.expedited }
+  ];
   const { items, lines, subtotalCents, hydrated } = useCart();
   const [shippingMethod, setShippingMethod] = useState<"standard" | "expedited">("standard");
   const [countryCode, setCountryCode] = useState("US");

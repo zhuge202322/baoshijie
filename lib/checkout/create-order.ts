@@ -2,6 +2,7 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import type { CommerceDatabase } from "../db/client.ts";
 import { getProductBySlug } from "../catalog/repository.ts";
 import { optionalText, requireText } from "../validation/common.ts";
+import { getShippingRates } from "./shipping.ts";
 import {
   calculateCheckoutTotals,
   isSupportedDestination,
@@ -88,7 +89,11 @@ export function createGuestOrder(database: CommerceDatabase, input: GuestOrderIn
     }
     return { product, quantity: line.quantity, lineTotalCents: product.priceCents * line.quantity };
   });
-  const totals = calculateCheckoutTotals(products.map((item) => item.lineTotalCents), input.shippingMethod);
+  const totals = calculateCheckoutTotals(
+    products.map((item) => item.lineTotalCents),
+    input.shippingMethod,
+    getShippingRates(database)
+  );
   const now = options.now ?? Date.now();
   const orderId = options.orderId || `order-${randomUUID()}`;
   const orderNumber = options.orderNumber || defaultOrderNumber(now);

@@ -93,6 +93,14 @@ export function seedDatabase(database: CommerceDatabase) {
     insertSocial.run("social-instagram", "instagram", "Instagram", "https://www.instagram.com/", 10, now, now);
     insertSocial.run("social-facebook", "facebook", "Facebook", "https://www.facebook.com/", 20, now, now);
 
+    const insertShippingRate = database.prepare(`
+      INSERT INTO shipping_rates (method, price_cents, updated_at)
+      VALUES (?, ?, ?)
+      ON CONFLICT(method) DO NOTHING
+    `);
+    insertShippingRate.run("standard", 1200, now);
+    insertShippingRate.run("expedited", 4500, now);
+
     const insertMedia = database.prepare(`
       INSERT INTO media_slots (
         slot_key, page, section_label, image_url, default_image_url, alt_text, sort_order, updated_at

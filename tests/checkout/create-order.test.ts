@@ -4,6 +4,7 @@ import { createGuestOrder } from "../../lib/checkout/create-order.ts";
 import { createDatabase, migrateDatabase } from "../../lib/db/client.ts";
 import { seedDatabase } from "../../lib/db/seed.ts";
 import { archiveProduct } from "../../lib/catalog/repository.ts";
+import { updateShippingRates } from "../../lib/checkout/shipping.ts";
 
 function setup() {
   const database = createDatabase(":memory:");
@@ -57,6 +58,23 @@ test("guest order reprices products from SQLite and stores immutable item snapsh
     assert.equal(item?.unit_price_cents, 62000);
     assert.equal(item?.line_total_cents, 124000);
     assert.equal(item?.name, "Precision Short Shifter");
+  } finally {
+    database.close();
+  }
+});
+
+test("guest orders use the shipping rate configured in SQLite", () => {
+  const database = setup();
+  try {
+    updateShippingRates(database, { standard: 1899, expedited: 5275 });
+    const order = createGuestOrder(database, {
+      lines: [{ slug: "precision-short-shifter", quantity: 1 }],
+      shippingMethod: "standard",
+      paymentProvider: "paypal",
+      customer
+    });
+    assert.equal(order.totals.shippingCents, 1899);
+    assert.equal(order.totals.totalCents, 63899);
   } finally {
     database.close();
   }

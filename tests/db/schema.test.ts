@@ -13,6 +13,7 @@ const expectedTables = [
   "orders",
   "payments",
   "products",
+  "shipping_rates",
   "site_settings",
   "social_links",
   "webhook_events"
